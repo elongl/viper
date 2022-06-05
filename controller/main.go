@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"flag"
 	"fmt"
-	"io"
 	"log"
 	"net"
 	"os"
@@ -30,9 +29,6 @@ func (s *agentServer) RunShellCommand(stream pb.Agent_RunShellCommandServer) err
 		text, _ := reader.ReadString('\n')
 		stream.Send(&pb.ShellCommandRequest{Cmd: strings.TrimSpace(text)})
 		in, err := stream.Recv()
-		if err == io.EOF {
-			return nil
-		}
 		if err != nil {
 			log.Fatalf("Failed to receive shell command output: %v", err)
 		}
