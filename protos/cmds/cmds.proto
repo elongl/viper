@@ -11,5 +11,5 @@ message ShellCommandRequest {
 }
 
 message ShellCommandResponse {
-  string output = 1;
+  bytes output = 1;
 }
