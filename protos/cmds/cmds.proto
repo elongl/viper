@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+option go_package = "./cmds";
+
+service Agent {
+  rpc RunShellCommand (stream ShellCommandResponse) returns (stream ShellCommandRequest) {}
+}
+
+message ShellCommandRequest {
+  string cmd = 1;
+}
+
+message ShellCommandResponse {
+  string output = 1;
+}
