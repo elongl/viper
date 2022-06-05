@@ -2,7 +2,6 @@ package shell
 
 import (
 	"context"
-	"io"
 	"log"
 	"os/exec"
 	"runtime"
@@ -14,28 +13,17 @@ func StartModule(client pb.AgentClient) {
 	if err != nil {
 		log.Fatalf("Failed to open stream: %v", err)
 	}
-	waitc := make(chan struct{})
-	go func() {
-		for {
-			in, err := stream.Recv()
-			if err == io.EOF {
-				close(waitc)
-				return
-			}
-			if err != nil {
-				log.Fatalf("Failed to receive a shell command: %v", err)
-			}
-			log.Printf("Received shell command: '%s'", in.Cmd)
-			err = stream.Send(&pb.ShellCommandResponse{Output: runShellCommand(in.Cmd)})
-			if err != nil {
-				log.Printf("Failed to send shell command response: %v", err)
-			}
+	for {
+		in, err := stream.Recv()
+		if err != nil {
+			log.Fatalf("Failed to receive a shell command: %v", err)
 		}
-	}()
-	if err != nil {
-		log.Fatalf("Failed to send shell command output: %v", err)
+		log.Printf("Received shell command: '%s'", in.Cmd)
+		err = stream.Send(&pb.ShellCommandResponse{Output: runShellCommand(in.Cmd)})
+		if err != nil {
+			log.Printf("Failed to send shell command response: %v", err)
+		}
 	}
-	<-waitc
 }
 
 func runShellCommand(cmdline string) []byte {
