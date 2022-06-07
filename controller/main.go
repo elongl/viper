@@ -1,12 +1,10 @@
 package main
 
 import (
-	"bufio"
 	"flag"
 	"fmt"
 	"log"
 	"net"
-	"os"
 	"strings"
 
 	pb "viper/protos/cmds"
@@ -15,7 +13,8 @@ import (
 )
 
 var (
-	port = flag.Int("port", 50051, "The server port")
+	port      = flag.Int("port", 50051, "The server port")
+	shellCmds = make(chan string)
 )
 
 type agentServer struct {
@@ -23,11 +22,9 @@ type agentServer struct {
 }
 
 func (s *agentServer) RunShellCommand(stream pb.Agent_RunShellCommandServer) error {
+	shellCmds <- "whoami"
 	for {
-		reader := bufio.NewReader(os.Stdin)
-		fmt.Print("> ")
-		text, _ := reader.ReadString('\n')
-		stream.Send(&pb.ShellCommandRequest{Cmd: strings.TrimSpace(text)})
+		stream.Send(&pb.ShellCommandRequest{Cmd: strings.TrimSpace(<-shellCmds)})
 		in, err := stream.Recv()
 		if err != nil {
 			log.Fatalf("Failed to receive shell command output: %v", err)
