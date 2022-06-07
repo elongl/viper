@@ -26,7 +26,7 @@ func main() {
 	client := pb.NewAgentManagerClient(conn)
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
-	resp, err := client.RunShellCommand(ctx, &pb.ShellCommandRequest{Cmd: "whoami"})
+	resp, err := client.RunShellCommand(ctx, &pb.ShellCommandRequest{Cmd: "whoami", Addr: "127.0.0.1:61929"})
 	if err != nil {
 		log.Fatalf("Failed to run command: %v", err)
 	}

@@ -12,6 +12,7 @@ service AgentManager {
 
 message ShellCommandRequest {
   string cmd = 1;
+  string Addr = 2;
 }
 
 message ShellCommandResponse {
