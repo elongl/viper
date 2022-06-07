@@ -16,10 +16,10 @@ var (
 
 func (s *AgentServer) RunShellCommand(stream pb.Agent_RunShellCommandServer) error {
 	peer, ok := peer.FromContext(stream.Context())
-	peerAddr := peer.Addr.String()
 	if !ok {
 		log.Fatal("Failed to get peer from context")
 	}
+	peerAddr := peer.Addr.String()
 	requests[peerAddr] = make(chan string)
 	responses[peerAddr] = make(chan []byte)
 	for {
