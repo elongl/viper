@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"log"
@@ -13,29 +14,45 @@ import (
 )
 
 var (
-	port      = flag.Int("port", 50051, "The server port")
-	shellCmds = make(chan string)
+	agentServerPort        = flag.Int("port", 50051, "Agent server port")
+	agentManagerServerPort = flag.Int("port", 50052, "Agent management server port")
+
+	requests  = make(chan string)
+	responses = make(chan string)
 )
 
 type agentServer struct {
 	pb.UnimplementedAgentServer
 }
 
+type agentManagerServer struct {
+	pb.UnimplementedAgentManagerServer
+}
+
 func (s *agentServer) RunShellCommand(stream pb.Agent_RunShellCommandServer) error {
-	shellCmds <- "whoami"
 	for {
-		stream.Send(&pb.ShellCommandRequest{Cmd: strings.TrimSpace(<-shellCmds)})
+		cmd := <-requests
+		log.Printf("Sending command to the agent: '%s'", cmd)
+		stream.Send(&pb.ShellCommandRequest{Cmd: strings.TrimSpace(cmd)})
 		in, err := stream.Recv()
 		if err != nil {
 			log.Fatalf("Failed to receive shell command output: %v", err)
 		}
-		fmt.Printf(">> %s", in.Output)
+		responses <- in.Output
 	}
+}
+
+func (s *agentManagerServer) RunShellCommand(context context.Context, req *pb.ShellCommandRequest) (*pb.ShellCommandResponse, error) {
+	log.Printf("Sending command to the agent server: '%s'", req.Cmd)
+	requests <- req.Cmd
+	response := pb.ShellCommandResponse{Output: <-responses}
+	log.Printf("Received command response: '%s'", response.Output)
+	return &response, nil
 }
 
 func main() {
 	flag.Parse()
-	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", *port))
+	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", *agentServerPort))
 	if err != nil {
 		log.Fatalf("Failed to listen: %v", err)
 	}

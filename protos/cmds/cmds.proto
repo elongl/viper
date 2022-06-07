@@ -6,10 +6,14 @@ service Agent {
   rpc RunShellCommand (stream ShellCommandResponse) returns (stream ShellCommandRequest) {}
 }
 
+service AgentManager {
+  rpc RunShellCommand (ShellCommandRequest) returns (ShellCommandResponse) {}
+}
+
 message ShellCommandRequest {
   string cmd = 1;
 }
 
 message ShellCommandResponse {
-  bytes output = 1;
+  string output = 1;
 }

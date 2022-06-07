@@ -135,3 +135,89 @@ var Agent_ServiceDesc = grpc.ServiceDesc{
 	},
 	Metadata: "cmds.proto",
 }
+
+// AgentManagerClient is the client API for AgentManager service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+type AgentManagerClient interface {
+	RunShellCommand(ctx context.Context, in *ShellCommandRequest, opts ...grpc.CallOption) (*ShellCommandResponse, error)
+}
+
+type agentManagerClient struct {
+	cc grpc.ClientConnInterface
+}
+
+func NewAgentManagerClient(cc grpc.ClientConnInterface) AgentManagerClient {
+	return &agentManagerClient{cc}
+}
+
+func (c *agentManagerClient) RunShellCommand(ctx context.Context, in *ShellCommandRequest, opts ...grpc.CallOption) (*ShellCommandResponse, error) {
+	out := new(ShellCommandResponse)
+	err := c.cc.Invoke(ctx, "/AgentManager/RunShellCommand", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// AgentManagerServer is the server API for AgentManager service.
+// All implementations must embed UnimplementedAgentManagerServer
+// for forward compatibility
+type AgentManagerServer interface {
+	RunShellCommand(context.Context, *ShellCommandRequest) (*ShellCommandResponse, error)
+	mustEmbedUnimplementedAgentManagerServer()
+}
+
+// UnimplementedAgentManagerServer must be embedded to have forward compatible implementations.
+type UnimplementedAgentManagerServer struct {
+}
+
+func (UnimplementedAgentManagerServer) RunShellCommand(context.Context, *ShellCommandRequest) (*ShellCommandResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RunShellCommand not implemented")
+}
+func (UnimplementedAgentManagerServer) mustEmbedUnimplementedAgentManagerServer() {}
+
+// UnsafeAgentManagerServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to AgentManagerServer will
+// result in compilation errors.
+type UnsafeAgentManagerServer interface {
+	mustEmbedUnimplementedAgentManagerServer()
+}
+
+func RegisterAgentManagerServer(s grpc.ServiceRegistrar, srv AgentManagerServer) {
+	s.RegisterService(&AgentManager_ServiceDesc, srv)
+}
+
+func _AgentManager_RunShellCommand_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ShellCommandRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AgentManagerServer).RunShellCommand(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/AgentManager/RunShellCommand",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AgentManagerServer).RunShellCommand(ctx, req.(*ShellCommandRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+// AgentManager_ServiceDesc is the grpc.ServiceDesc for AgentManager service.
+// It's only intended for direct use with grpc.RegisterService,
+// and not to be introspected or modified (even as a copy)
+var AgentManager_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "AgentManager",
+	HandlerType: (*AgentManagerServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "RunShellCommand",
+			Handler:    _AgentManager_RunShellCommand_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "cmds.proto",
+}
