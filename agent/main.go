@@ -21,7 +21,7 @@ func main() {
 		log.Fatalf("Failed to connect: %v", err)
 	}
 	defer conn.Close()
-
 	client := pb.NewAgentClient(conn)
-	shell.StartModule(client)
+	go shell.RunModule(client)
+	select {}
 }

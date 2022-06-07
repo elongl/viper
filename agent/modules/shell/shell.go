@@ -8,7 +8,7 @@ import (
 	pb "viper/protos/cmds"
 )
 
-func StartModule(client pb.AgentClient) {
+func RunModule(client pb.AgentClient) {
 	stream, err := client.RunShellCommand(context.Background())
 	if err != nil {
 		log.Fatalf("Failed to open stream: %v", err)
