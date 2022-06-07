@@ -23,5 +23,6 @@ func main() {
 	defer conn.Close()
 	client := pb.NewAgentClient(conn)
 	go shell.RunModule(client)
+	log.Print("Agent started.")
 	select {}
 }
