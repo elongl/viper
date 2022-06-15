@@ -4,6 +4,7 @@ import (
 	"context"
 	"flag"
 	"log"
+	"strings"
 	"time"
 
 	pb "viper/protos/cmds"
@@ -38,9 +39,17 @@ func main() {
 		log.Printf("Agent: %s", agent.GetAddr())
 	}
 
-	// shellOutput, err := client.RunShellCommand(ctx, &pb.ShellCommandRequest{Cmd: "whoami", Addr: "127.0.0.1:60495"})
-	// if err != nil {
-	// 	log.Fatalf("Failed to run command: %v", err)
-	// }
-	// log.Printf("Received command response: '%s'", strings.TrimSpace(string(shellOutput.Output)))
+	agentAddr := "127.0.0.1:61332"
+
+	shellOutput, err := client.RunShellCommand(ctx, &pb.ShellCommandRequest{Cmd: "whoami", Addr: agentAddr})
+	if err != nil {
+		log.Fatalf("Failed to run command: %v", err)
+	}
+	log.Printf("Received command response: '%s'", strings.TrimSpace(string(shellOutput.Output)))
+
+	echoOutput, err := client.RunEchoCommand(ctx, &pb.EchoCommandRequest{Text: "Hello World!", Addr: agentAddr})
+	if err != nil {
+		log.Fatalf("Failed to run command: %v", err)
+	}
+	log.Printf("Received echo response: '%s'", echoOutput.Text)
 }

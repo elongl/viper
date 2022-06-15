@@ -22,6 +22,7 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type AgentClient interface {
+	RunEchoCommand(ctx context.Context, opts ...grpc.CallOption) (Agent_RunEchoCommandClient, error)
 	RunShellCommand(ctx context.Context, opts ...grpc.CallOption) (Agent_RunShellCommandClient, error)
 }
 
@@ -33,8 +34,39 @@ func NewAgentClient(cc grpc.ClientConnInterface) AgentClient {
 	return &agentClient{cc}
 }
 
+func (c *agentClient) RunEchoCommand(ctx context.Context, opts ...grpc.CallOption) (Agent_RunEchoCommandClient, error) {
+	stream, err := c.cc.NewStream(ctx, &Agent_ServiceDesc.Streams[0], "/Agent/RunEchoCommand", opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &agentRunEchoCommandClient{stream}
+	return x, nil
+}
+
+type Agent_RunEchoCommandClient interface {
+	Send(*EchoCommandResponse) error
+	Recv() (*EchoCommandRequest, error)
+	grpc.ClientStream
+}
+
+type agentRunEchoCommandClient struct {
+	grpc.ClientStream
+}
+
+func (x *agentRunEchoCommandClient) Send(m *EchoCommandResponse) error {
+	return x.ClientStream.SendMsg(m)
+}
+
+func (x *agentRunEchoCommandClient) Recv() (*EchoCommandRequest, error) {
+	m := new(EchoCommandRequest)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
 func (c *agentClient) RunShellCommand(ctx context.Context, opts ...grpc.CallOption) (Agent_RunShellCommandClient, error) {
-	stream, err := c.cc.NewStream(ctx, &Agent_ServiceDesc.Streams[0], "/Agent/RunShellCommand", opts...)
+	stream, err := c.cc.NewStream(ctx, &Agent_ServiceDesc.Streams[1], "/Agent/RunShellCommand", opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -68,6 +100,7 @@ func (x *agentRunShellCommandClient) Recv() (*ShellCommandRequest, error) {
 // All implementations must embed UnimplementedAgentServer
 // for forward compatibility
 type AgentServer interface {
+	RunEchoCommand(Agent_RunEchoCommandServer) error
 	RunShellCommand(Agent_RunShellCommandServer) error
 	mustEmbedUnimplementedAgentServer()
 }
@@ -76,6 +109,9 @@ type AgentServer interface {
 type UnimplementedAgentServer struct {
 }
 
+func (UnimplementedAgentServer) RunEchoCommand(Agent_RunEchoCommandServer) error {
+	return status.Errorf(codes.Unimplemented, "method RunEchoCommand not implemented")
+}
 func (UnimplementedAgentServer) RunShellCommand(Agent_RunShellCommandServer) error {
 	return status.Errorf(codes.Unimplemented, "method RunShellCommand not implemented")
 }
@@ -90,6 +126,32 @@ type UnsafeAgentServer interface {
 
 func RegisterAgentServer(s grpc.ServiceRegistrar, srv AgentServer) {
 	s.RegisterService(&Agent_ServiceDesc, srv)
+}
+
+func _Agent_RunEchoCommand_Handler(srv interface{}, stream grpc.ServerStream) error {
+	return srv.(AgentServer).RunEchoCommand(&agentRunEchoCommandServer{stream})
+}
+
+type Agent_RunEchoCommandServer interface {
+	Send(*EchoCommandRequest) error
+	Recv() (*EchoCommandResponse, error)
+	grpc.ServerStream
+}
+
+type agentRunEchoCommandServer struct {
+	grpc.ServerStream
+}
+
+func (x *agentRunEchoCommandServer) Send(m *EchoCommandRequest) error {
+	return x.ServerStream.SendMsg(m)
+}
+
+func (x *agentRunEchoCommandServer) Recv() (*EchoCommandResponse, error) {
+	m := new(EchoCommandResponse)
+	if err := x.ServerStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
 }
 
 func _Agent_RunShellCommand_Handler(srv interface{}, stream grpc.ServerStream) error {
@@ -127,6 +189,12 @@ var Agent_ServiceDesc = grpc.ServiceDesc{
 	Methods:     []grpc.MethodDesc{},
 	Streams: []grpc.StreamDesc{
 		{
+			StreamName:    "RunEchoCommand",
+			Handler:       _Agent_RunEchoCommand_Handler,
+			ServerStreams: true,
+			ClientStreams: true,
+		},
+		{
 			StreamName:    "RunShellCommand",
 			Handler:       _Agent_RunShellCommand_Handler,
 			ServerStreams: true,
@@ -140,6 +208,7 @@ var Agent_ServiceDesc = grpc.ServiceDesc{
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type AgentManagerClient interface {
+	RunEchoCommand(ctx context.Context, in *EchoCommandRequest, opts ...grpc.CallOption) (*EchoCommandResponse, error)
 	RunShellCommand(ctx context.Context, in *ShellCommandRequest, opts ...grpc.CallOption) (*ShellCommandResponse, error)
 	GetAgents(ctx context.Context, in *Empty, opts ...grpc.CallOption) (AgentManager_GetAgentsClient, error)
 }
@@ -150,6 +219,15 @@ type agentManagerClient struct {
 
 func NewAgentManagerClient(cc grpc.ClientConnInterface) AgentManagerClient {
 	return &agentManagerClient{cc}
+}
+
+func (c *agentManagerClient) RunEchoCommand(ctx context.Context, in *EchoCommandRequest, opts ...grpc.CallOption) (*EchoCommandResponse, error) {
+	out := new(EchoCommandResponse)
+	err := c.cc.Invoke(ctx, "/AgentManager/RunEchoCommand", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 func (c *agentManagerClient) RunShellCommand(ctx context.Context, in *ShellCommandRequest, opts ...grpc.CallOption) (*ShellCommandResponse, error) {
@@ -197,6 +275,7 @@ func (x *agentManagerGetAgentsClient) Recv() (*AgentInfo, error) {
 // All implementations must embed UnimplementedAgentManagerServer
 // for forward compatibility
 type AgentManagerServer interface {
+	RunEchoCommand(context.Context, *EchoCommandRequest) (*EchoCommandResponse, error)
 	RunShellCommand(context.Context, *ShellCommandRequest) (*ShellCommandResponse, error)
 	GetAgents(*Empty, AgentManager_GetAgentsServer) error
 	mustEmbedUnimplementedAgentManagerServer()
@@ -206,6 +285,9 @@ type AgentManagerServer interface {
 type UnimplementedAgentManagerServer struct {
 }
 
+func (UnimplementedAgentManagerServer) RunEchoCommand(context.Context, *EchoCommandRequest) (*EchoCommandResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RunEchoCommand not implemented")
+}
 func (UnimplementedAgentManagerServer) RunShellCommand(context.Context, *ShellCommandRequest) (*ShellCommandResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RunShellCommand not implemented")
 }
@@ -223,6 +305,24 @@ type UnsafeAgentManagerServer interface {
 
 func RegisterAgentManagerServer(s grpc.ServiceRegistrar, srv AgentManagerServer) {
 	s.RegisterService(&AgentManager_ServiceDesc, srv)
+}
+
+func _AgentManager_RunEchoCommand_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(EchoCommandRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AgentManagerServer).RunEchoCommand(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/AgentManager/RunEchoCommand",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AgentManagerServer).RunEchoCommand(ctx, req.(*EchoCommandRequest))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _AgentManager_RunShellCommand_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -271,6 +371,10 @@ var AgentManager_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "AgentManager",
 	HandlerType: (*AgentManagerServer)(nil),
 	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "RunEchoCommand",
+			Handler:    _AgentManager_RunEchoCommand_Handler,
+		},
 		{
 			MethodName: "RunShellCommand",
 			Handler:    _AgentManager_RunShellCommand_Handler,

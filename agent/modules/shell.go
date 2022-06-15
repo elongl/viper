@@ -1,4 +1,4 @@
-package shell
+package modules
 
 import (
 	"context"
@@ -8,7 +8,7 @@ import (
 	pb "viper/protos/cmds"
 )
 
-func RunModule(client pb.AgentClient) {
+func runShellModule(client pb.AgentClient) {
 	stream, err := client.RunShellCommand(context.Background())
 	if err != nil {
 		log.Fatalf("Failed to open stream: %v", err)

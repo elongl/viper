@@ -4,7 +4,7 @@ import (
 	"flag"
 	"log"
 
-	"viper/agent/modules/shell"
+	"viper/agent/modules"
 	pb "viper/protos/cmds"
 
 	"google.golang.org/grpc"
@@ -22,8 +22,7 @@ func main() {
 	}
 	defer conn.Close()
 	client := pb.NewAgentClient(conn)
-	log.Print("Starting agent modules.")
-	go shell.RunModule(client)
+	modules.InitModules(client)
 	log.Print("Agent started.")
 	select {}
 }

@@ -2,8 +2,6 @@ package commands
 
 import (
 	"context"
-	"errors"
-	"fmt"
 	"log"
 	"strings"
 	"viper/controller/agents"
@@ -32,17 +30,15 @@ func (s *AgentServer) RunShellCommand(stream pb.Agent_RunShellCommandServer) err
 	}
 }
 
-func (s *AgentManagerServer) RunShellCommand(context context.Context, req *pb.ShellCommandRequest) (*pb.ShellCommandResponse, error) {
+func (s *AgentManagerServer) RunShellCommand(ctx context.Context, req *pb.ShellCommandRequest) (*pb.ShellCommandResponse, error) {
 	log.Printf("Sending command to the agent server: '%s'", req.Cmd)
-	if agent, ok := agents.Agents[req.Addr]; ok {
-		queue := agent.Queues.Shell
-		queue.Reqs <- req.Cmd
-		response := pb.ShellCommandResponse{Output: <-queue.Resps}
-		log.Printf("Received command response.")
-		return &response, nil
-	} else {
-		msg := fmt.Sprintf("Agent '%s' is not connected", req.Addr)
-		log.Print(msg)
-		return nil, errors.New(msg)
+	agent, err := agents.GetAgent(req.Addr)
+	if err != nil {
+		return nil, err
 	}
+	queue := agent.Queues.Shell
+	queue.Reqs <- req.Cmd
+	response := pb.ShellCommandResponse{Output: <-queue.Resps}
+	log.Printf("Received command response.")
+	return &response, nil
 }
