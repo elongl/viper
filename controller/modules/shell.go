@@ -6,14 +6,10 @@ import (
 	"fmt"
 	"log"
 	"strings"
+	"viper/controller/agents"
 	pb "viper/protos/cmds"
 
 	"google.golang.org/grpc/peer"
-)
-
-var (
-	requests  = make(map[string](chan string))
-	responses = make(map[string](chan []byte))
 )
 
 func (s *AgentServer) RunShellCommand(stream pb.Agent_RunShellCommandServer) error {
@@ -22,27 +18,26 @@ func (s *AgentServer) RunShellCommand(stream pb.Agent_RunShellCommandServer) err
 		log.Fatal("Failed to get peer from context")
 	}
 	peerAddr := peer.Addr.String()
-	requests[peerAddr] = make(chan string)
-	responses[peerAddr] = make(chan []byte)
+	queue := agents.Agents[peerAddr].Queues.Shell
 	for {
-		cmd := <-requests[peerAddr]
+		cmd := <-queue.Reqs
 		log.Printf("Sending command to the agent: '%s'", cmd)
 		stream.Send(&pb.ShellCommandRequest{Cmd: strings.TrimSpace(cmd)})
 		in, err := stream.Recv()
 		if err != nil {
-			log.Print("Agent disconnected")
-			delete(requests, peerAddr)
+			agents.DeleteAgent(peerAddr)
 			return err
 		}
-		responses[peerAddr] <- in.Output
+		queue.Resps <- in.Output
 	}
 }
 
 func (s *AgentManagerServer) RunShellCommand(context context.Context, req *pb.ShellCommandRequest) (*pb.ShellCommandResponse, error) {
 	log.Printf("Sending command to the agent server: '%s'", req.Cmd)
-	if _, ok := requests[req.Addr]; ok {
-		requests[req.Addr] <- req.Cmd
-		response := pb.ShellCommandResponse{Output: <-responses[req.Addr]}
+	if agent, ok := agents.Agents[req.Addr]; ok {
+		queue := agent.Queues.Shell
+		queue.Reqs <- req.Cmd
+		response := pb.ShellCommandResponse{Output: <-queue.Resps}
 		log.Printf("Received command response.")
 		return &response, nil
 	} else {

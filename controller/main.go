@@ -6,6 +6,7 @@ import (
 	"log"
 	"net"
 
+	"viper/controller/agents"
 	"viper/controller/modules"
 	pb "viper/protos/cmds"
 
@@ -24,7 +25,7 @@ func identifyAgentInterceptor() grpc.StreamServerInterceptor {
 		if !ok {
 			log.Fatal("Failed to get peer from context")
 		}
-		log.Printf("Received new agent connection: %v", peer.Addr.String())
+		agents.InitAgent(peer.Addr.String())
 		handler(srv, stream)
 		return nil
 	}
