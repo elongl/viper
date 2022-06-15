@@ -12,6 +12,7 @@ type AgentQueues struct {
 }
 
 type Agent struct {
+	Addr   string
 	Queues AgentQueues
 }
 
@@ -26,7 +27,7 @@ func initShellQueue(agent *Agent) {
 
 func InitAgent(peerAddr string) {
 	log.Printf("Initializing agent: %v", peerAddr)
-	agent := Agent{}
+	agent := Agent{Addr: peerAddr}
 	initShellQueue(&agent)
 	Agents[peerAddr] = agent
 }

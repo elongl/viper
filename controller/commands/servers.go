@@ -1,4 +1,4 @@
-package modules
+package commands
 
 import (
 	pb "viper/protos/cmds"

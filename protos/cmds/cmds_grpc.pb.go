@@ -141,6 +141,7 @@ var Agent_ServiceDesc = grpc.ServiceDesc{
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type AgentManagerClient interface {
 	RunShellCommand(ctx context.Context, in *ShellCommandRequest, opts ...grpc.CallOption) (*ShellCommandResponse, error)
+	GetAgents(ctx context.Context, in *Empty, opts ...grpc.CallOption) (AgentManager_GetAgentsClient, error)
 }
 
 type agentManagerClient struct {
@@ -160,11 +161,44 @@ func (c *agentManagerClient) RunShellCommand(ctx context.Context, in *ShellComma
 	return out, nil
 }
 
+func (c *agentManagerClient) GetAgents(ctx context.Context, in *Empty, opts ...grpc.CallOption) (AgentManager_GetAgentsClient, error) {
+	stream, err := c.cc.NewStream(ctx, &AgentManager_ServiceDesc.Streams[0], "/AgentManager/GetAgents", opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &agentManagerGetAgentsClient{stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+type AgentManager_GetAgentsClient interface {
+	Recv() (*AgentInfo, error)
+	grpc.ClientStream
+}
+
+type agentManagerGetAgentsClient struct {
+	grpc.ClientStream
+}
+
+func (x *agentManagerGetAgentsClient) Recv() (*AgentInfo, error) {
+	m := new(AgentInfo)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
 // AgentManagerServer is the server API for AgentManager service.
 // All implementations must embed UnimplementedAgentManagerServer
 // for forward compatibility
 type AgentManagerServer interface {
 	RunShellCommand(context.Context, *ShellCommandRequest) (*ShellCommandResponse, error)
+	GetAgents(*Empty, AgentManager_GetAgentsServer) error
 	mustEmbedUnimplementedAgentManagerServer()
 }
 
@@ -174,6 +208,9 @@ type UnimplementedAgentManagerServer struct {
 
 func (UnimplementedAgentManagerServer) RunShellCommand(context.Context, *ShellCommandRequest) (*ShellCommandResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RunShellCommand not implemented")
+}
+func (UnimplementedAgentManagerServer) GetAgents(*Empty, AgentManager_GetAgentsServer) error {
+	return status.Errorf(codes.Unimplemented, "method GetAgents not implemented")
 }
 func (UnimplementedAgentManagerServer) mustEmbedUnimplementedAgentManagerServer() {}
 
@@ -206,6 +243,27 @@ func _AgentManager_RunShellCommand_Handler(srv interface{}, ctx context.Context,
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AgentManager_GetAgents_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(Empty)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(AgentManagerServer).GetAgents(m, &agentManagerGetAgentsServer{stream})
+}
+
+type AgentManager_GetAgentsServer interface {
+	Send(*AgentInfo) error
+	grpc.ServerStream
+}
+
+type agentManagerGetAgentsServer struct {
+	grpc.ServerStream
+}
+
+func (x *agentManagerGetAgentsServer) Send(m *AgentInfo) error {
+	return x.ServerStream.SendMsg(m)
+}
+
 // AgentManager_ServiceDesc is the grpc.ServiceDesc for AgentManager service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -218,6 +276,12 @@ var AgentManager_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _AgentManager_RunShellCommand_Handler,
 		},
 	},
-	Streams:  []grpc.StreamDesc{},
+	Streams: []grpc.StreamDesc{
+		{
+			StreamName:    "GetAgents",
+			Handler:       _AgentManager_GetAgents_Handler,
+			ServerStreams: true,
+		},
+	},
 	Metadata: "cmds.proto",
 }

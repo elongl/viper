@@ -7,7 +7,7 @@ import (
 	"net"
 
 	"viper/controller/agents"
-	"viper/controller/modules"
+	"viper/controller/commands"
 	pb "viper/protos/cmds"
 
 	"google.golang.org/grpc"
@@ -37,7 +37,7 @@ func runAgentServer() {
 		log.Fatalf("Failed to listen: %v", err)
 	}
 	server := grpc.NewServer(grpc.StreamInterceptor(identifyAgentInterceptor()))
-	pb.RegisterAgentServer(server, &modules.AgentServer{})
+	pb.RegisterAgentServer(server, &commands.AgentServer{})
 	log.Printf("Agent server listening at %v", lis.Addr())
 	if err := server.Serve(lis); err != nil {
 		log.Fatalf("Failed to serve: %v", err)
@@ -51,7 +51,7 @@ func runAgentManagerServer() {
 		log.Fatalf("Failed to listen: %v", err)
 	}
 	server := grpc.NewServer()
-	pb.RegisterAgentManagerServer(server, &modules.AgentManagerServer{})
+	pb.RegisterAgentManagerServer(server, &commands.AgentManagerServer{})
 	log.Printf("Agent manager server listening at %v", lis.Addr())
 	if err := server.Serve(lis); err != nil {
 		log.Fatalf("Failed to serve: %v", err)

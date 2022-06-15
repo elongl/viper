@@ -4,7 +4,6 @@ import (
 	"context"
 	"flag"
 	"log"
-	"strings"
 	"time"
 
 	pb "viper/protos/cmds"
@@ -26,9 +25,22 @@ func main() {
 	client := pb.NewAgentManagerClient(conn)
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
-	resp, err := client.RunShellCommand(ctx, &pb.ShellCommandRequest{Cmd: "whoami", Addr: "127.0.0.1:60495"})
+
+	agentsStream, err := client.GetAgents(ctx, &pb.Empty{})
 	if err != nil {
-		log.Fatalf("Failed to run command: %v", err)
+		log.Fatalf("Failed to get agents: %v", err)
 	}
-	log.Printf("Received command response: '%s'", strings.TrimSpace(string(resp.Output)))
+	for {
+		agent, err := agentsStream.Recv()
+		if err != nil {
+			break
+		}
+		log.Printf("Agent: %s", agent.GetAddr())
+	}
+
+	// shellOutput, err := client.RunShellCommand(ctx, &pb.ShellCommandRequest{Cmd: "whoami", Addr: "127.0.0.1:60495"})
+	// if err != nil {
+	// 	log.Fatalf("Failed to run command: %v", err)
+	// }
+	// log.Printf("Received command response: '%s'", strings.TrimSpace(string(shellOutput.Output)))
 }

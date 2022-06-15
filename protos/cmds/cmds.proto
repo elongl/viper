@@ -8,6 +8,7 @@ service Agent {
 
 service AgentManager {
   rpc RunShellCommand (ShellCommandRequest) returns (ShellCommandResponse) {}
+  rpc GetAgents(Empty) returns (stream AgentInfo) {}
 }
 
 message ShellCommandRequest {
@@ -18,3 +19,9 @@ message ShellCommandRequest {
 message ShellCommandResponse {
   bytes output = 1;
 }
+
+message AgentInfo {
+  string Addr = 1;
+}
+
+message Empty {}
