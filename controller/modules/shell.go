@@ -2,6 +2,8 @@ package modules
 
 import (
 	"context"
+	"errors"
+	"fmt"
 	"log"
 	"strings"
 	pb "viper/protos/cmds"
@@ -23,13 +25,14 @@ func (s *AgentServer) RunShellCommand(stream pb.Agent_RunShellCommandServer) err
 	requests[peerAddr] = make(chan string)
 	responses[peerAddr] = make(chan []byte)
 	for {
-		log.Printf("Listening on :%v", peerAddr)
 		cmd := <-requests[peerAddr]
 		log.Printf("Sending command to the agent: '%s'", cmd)
 		stream.Send(&pb.ShellCommandRequest{Cmd: strings.TrimSpace(cmd)})
 		in, err := stream.Recv()
 		if err != nil {
-			log.Fatalf("Failed to receive shell command output: %v", err)
+			log.Print("Agent disconnected")
+			delete(requests, peerAddr)
+			return err
 		}
 		responses[peerAddr] <- in.Output
 	}
@@ -37,8 +40,14 @@ func (s *AgentServer) RunShellCommand(stream pb.Agent_RunShellCommandServer) err
 
 func (s *AgentManagerServer) RunShellCommand(context context.Context, req *pb.ShellCommandRequest) (*pb.ShellCommandResponse, error) {
 	log.Printf("Sending command to the agent server: '%s'", req.Cmd)
-	requests[req.Addr] <- req.Cmd
-	response := pb.ShellCommandResponse{Output: <-responses[req.Addr]}
-	log.Printf("Received command response.")
-	return &response, nil
+	if _, ok := requests[req.Addr]; ok {
+		requests[req.Addr] <- req.Cmd
+		response := pb.ShellCommandResponse{Output: <-responses[req.Addr]}
+		log.Printf("Received command response.")
+		return &response, nil
+	} else {
+		msg := fmt.Sprintf("Agent '%s' is not connected", req.Addr)
+		log.Print(msg)
+		return nil, errors.New(msg)
+	}
 }
