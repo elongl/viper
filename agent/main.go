@@ -42,8 +42,24 @@ func main() {
 
 		switch cmd.Type {
 		case cmds.ECHO_CMD_TYPE:
+			log.Print("Received echo command.")
 			echoCmd := cmd.GetEchoCommandRequest()
-			conn.Write([]byte(echoCmd.Text))
+			log.Printf("Echo's text: '%s'", echoCmd.Text)
+			resp := &pb.EchoCommandResponse{Text: echoCmd.Text}
+			respBuffer, err := proto.Marshal(resp)
+			if err != nil {
+				log.Fatalf("Failed to marshal response: %v", err)
+			}
+			respBufferLen := int64(len(respBuffer))
+			err = binary.Write(conn, binary.LittleEndian, &respBufferLen)
+			if err != nil {
+				log.Fatalf("Failed to write: %v", err)
+			}
+			_, err = conn.Write(respBuffer)
+			if err != nil {
+				log.Fatalf("Failed to write: %v", err)
+			}
+			log.Print("Sent echo response.")
 		}
 	}
 }
