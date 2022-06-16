@@ -2,19 +2,32 @@ syntax = "proto3";
 
 option go_package = "./cmds";
 
-service Agent {
-  rpc RunEchoCommand (stream EchoCommandResponse) returns (stream EchoCommandRequest) {}
-  rpc RunShellCommand (stream ShellCommandResponse) returns (stream ShellCommandRequest) {}
-}
-
 service AgentManager {
   rpc RunEchoCommand (EchoCommandRequest) returns (EchoCommandResponse) {}
   rpc RunShellCommand (ShellCommandRequest) returns (ShellCommandResponse) {}
   rpc GetAgents(Empty) returns (stream AgentInfo) {}
 }
 
+message Command {
+  int64 type = 1;
+  oneof command {
+    EchoCommandRequest echo_command_request = 2;
+    ShellCommandRequest shell_command_request = 3;
+  }
+}
+
+message EchoCommandRequest {
+  string hostname = 1;
+  string text = 2;
+}
+
+message EchoCommandResponse {
+  string hostname = 1;
+  string text = 2;
+}
+
 message ShellCommandRequest {
-  string Addr = 1;
+  string hostname = 1;
   string cmd = 2;
 }
 
@@ -23,17 +36,7 @@ message ShellCommandResponse {
 }
 
 message AgentInfo {
-  string Addr = 1;
-}
-
-message EchoCommandRequest {
-  string Addr = 1;
-  string text = 2;
-}
-
-message EchoCommandResponse {
-  string Addr = 1;
-  string text = 2;
+  string hostname = 1;
 }
 
 message Empty {}

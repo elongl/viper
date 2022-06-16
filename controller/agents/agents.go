@@ -2,8 +2,8 @@ package agents
 
 import (
 	"errors"
-	"fmt"
 	"log"
+	"net"
 )
 
 type ShellCommandQueue struct {
@@ -22,12 +22,14 @@ type AgentQueues struct {
 }
 
 type Agent struct {
-	Addr   string
-	Queues AgentQueues
+	Hostname string
+	Conn     net.Conn
+	Queues   AgentQueues
+	Alive    bool
 }
 
 var (
-	Agents = make(map[string]Agent)
+	Agents []Agent
 )
 
 func initQueue(agent *Agent) {
@@ -38,28 +40,25 @@ func initQueue(agent *Agent) {
 	agent.Queues.Echo.Resps = make(chan string)
 }
 
-func GetAgent(peerAddr string) (*Agent, error) {
-	if agent, ok := Agents[peerAddr]; ok {
-		return &agent, nil
-	} else {
-		msg := fmt.Sprintf("Agent '%s' is not connected", peerAddr)
-		return nil, errors.New(msg)
+func GetAgent(hostname string) (*Agent, error) {
+	for _, agent := range Agents {
+		if agent.Hostname == hostname {
+			return &agent, nil
+		}
 	}
+	return nil, errors.New("Agent not found")
 }
 
-func InitAgent(peerAddr string) {
-	if _, ok := Agents[peerAddr]; !ok {
-		log.Printf("Initializing agent: %v", peerAddr)
-		agent := Agent{Addr: peerAddr}
-		initQueue(&agent)
-		Agents[peerAddr] = agent
-	}
+func InitAgent(conn net.Conn) {
+	log.Printf("Initializing agent: %v", conn.RemoteAddr())
+	agent := Agent{Conn: conn}
+	initQueue(&agent)
+	Agents = append(Agents, agent)
 }
 
-func DeleteAgent(peerAddr string) {
-	log.Printf("Deleting agent: %v", peerAddr)
-	agent := Agents[peerAddr]
+func DeleteAgent(agent *Agent) {
+	log.Printf("Deleting agent: %v", agent)
 	close(agent.Queues.Shell.Reqs)
 	close(agent.Queues.Shell.Resps)
-	delete(Agents, peerAddr)
+	agent.Alive = false
 }
