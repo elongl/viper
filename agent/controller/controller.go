@@ -2,8 +2,6 @@ package controller
 
 import (
 	"encoding/binary"
-	"errors"
-	"fmt"
 	"log"
 	"net"
 	"time"
@@ -34,21 +32,18 @@ func (cnc *Controller) ReadCommandRequest() (*pb.CommandRequest, error) {
 	var cmdSize int64
 	err := binary.Read(cnc.conn, binary.LittleEndian, &cmdSize)
 	if err != nil {
-		msg := fmt.Sprintf("Failed to read command size: %v", err)
-		return nil, errors.New(msg)
+		return nil, err
 	}
 
 	cmdBuffer := make([]byte, cmdSize)
 	_, err = cnc.conn.Read(cmdBuffer)
 	if err != nil {
-		msg := fmt.Sprintf("Failed to read command: %v", err)
-		return nil, errors.New(msg)
+		return nil, err
 	}
 	cmd := &pb.CommandRequest{}
 	err = proto.Unmarshal(cmdBuffer, cmd)
 	if err != nil {
-		msg := fmt.Sprintf("Failed to unmarshal command: %v", err)
-		return nil, errors.New(msg)
+		return nil, err
 	}
 	return cmd, nil
 }
@@ -56,19 +51,16 @@ func (cnc *Controller) ReadCommandRequest() (*pb.CommandRequest, error) {
 func (cnc *Controller) WriteCommandResponse(resp proto.Message) error {
 	respBuffer, err := proto.Marshal(resp)
 	if err != nil {
-		msg := fmt.Sprintf("Failed to marshal response: %v", err)
-		return errors.New(msg)
+		return err
 	}
 	respBufferLen := int64(len(respBuffer))
 	err = binary.Write(cnc.conn, binary.LittleEndian, &respBufferLen)
 	if err != nil {
-		msg := fmt.Sprintf("Failed to write response size: %v", err)
-		return errors.New(msg)
+		return err
 	}
 	_, err = cnc.conn.Write(respBuffer)
 	if err != nil {
-		msg := fmt.Sprintf("Failed to write response: %v", err)
-		return errors.New(msg)
+		return err
 	}
 	return nil
 }

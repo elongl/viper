@@ -2,13 +2,10 @@ package commands
 
 import (
 	"context"
-	"encoding/binary"
 	"log"
 	"viper/controller/agents"
 	"viper/protos/cmds"
 	pb "viper/protos/cmds"
-
-	"google.golang.org/protobuf/proto"
 )
 
 func (s *AgentManagerServer) RunEchoCommand(ctx context.Context, req *pb.EchoCommandRequest) (*pb.EchoCommandResponse, error) {
@@ -17,32 +14,13 @@ func (s *AgentManagerServer) RunEchoCommand(ctx context.Context, req *pb.EchoCom
 	if err != nil {
 		return nil, err
 	}
-	cmd := &pb.CommandRequest{Type: cmds.ECHO_CMD_TYPE, Req: &pb.CommandRequest_EchoCommandRequest{EchoCommandRequest: req}}
-	cmdBuffer, err := proto.Marshal(cmd)
-	if err != nil {
-		return nil, err
-	}
-	cmdBufferLen := int64(len(cmdBuffer))
-	err = binary.Write(agent.Conn, binary.LittleEndian, &cmdBufferLen)
-	if err != nil {
-		return nil, err
-	}
-	_, err = agent.Conn.Write(cmdBuffer)
-	if err != nil {
-		return nil, err
-	}
-	var respSize int64
-	err = binary.Read(agent.Conn, binary.LittleEndian, &respSize)
-	if err != nil {
-		return nil, err
-	}
-	respBuffer := make([]byte, respSize)
-	_, err = agent.Conn.Read(respBuffer)
+	cmdReq := &pb.CommandRequest{Type: cmds.ECHO_CMD_TYPE, Req: &pb.CommandRequest_EchoCommandRequest{EchoCommandRequest: req}}
+	err = agent.Write(cmdReq)
 	if err != nil {
 		return nil, err
 	}
 	resp := &pb.EchoCommandResponse{}
-	err = proto.Unmarshal(respBuffer, resp)
+	err = agent.Read(resp)
 	if err != nil {
 		return nil, err
 	}
