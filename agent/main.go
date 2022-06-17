@@ -13,8 +13,8 @@ var (
 )
 
 func main() {
-	controller := controller.Controller{}
-	controller.Connect(*addr)
+	controller := controller.Controller{Addr: *addr}
+	controller.Connect()
 	for {
 		cmd, err := controller.ReadCommandRequest()
 		if err != nil {
