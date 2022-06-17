@@ -22,6 +22,7 @@ type Agent struct {
 
 const (
 	ERR_AGENT_NO_LONGER_CONNECTED = "Agent no longer connected."
+	ERR_AGENT_NOT_FOUND           = "Agent not found."
 )
 
 var (
@@ -34,7 +35,7 @@ func GetAgent(hostname string) (*Agent, error) {
 			return agent, nil
 		}
 	}
-	return nil, errors.New("Agent not found")
+	return nil, errors.New(ERR_AGENT_NOT_FOUND)
 }
 
 func InitAgent(conn net.Conn) {
