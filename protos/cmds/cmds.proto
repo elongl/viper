@@ -8,9 +8,9 @@ service AgentManager {
   rpc GetAgents(Empty) returns (stream AgentInfo) {}
 }
 
-message Command {
+message CommandRequest {
   int64 type = 1;
-  oneof command {
+  oneof req {
     EchoCommandRequest echo_command_request = 2;
     ShellCommandRequest shell_command_request = 3;
   }

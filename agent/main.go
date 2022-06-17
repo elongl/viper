@@ -1,14 +1,11 @@
 package main
 
 import (
-	"encoding/binary"
 	"flag"
 	"log"
-	"net"
-	"viper/protos/cmds"
+	"viper/agent/controller"
+	"viper/agent/modules"
 	pb "viper/protos/cmds"
-
-	"google.golang.org/protobuf/proto"
 )
 
 var (
@@ -16,50 +13,17 @@ var (
 )
 
 func main() {
-	conn, err := net.Dial("tcp", *addr)
-	if err != nil {
-		log.Fatalf("Failed to connect: %v", err)
-	}
-	defer conn.Close()
-	log.Print("Connected to controller.")
+	controller := controller.Controller{}
+	controller.Connect(*addr)
 	for {
-		var cmdSize int64
-		err := binary.Read(conn, binary.LittleEndian, &cmdSize)
+		cmd, err := controller.ReadCommandRequest()
 		if err != nil {
-			log.Fatalf("Failed to read: %v", err)
+			log.Printf("Failed to read command: %v", err)
 		}
-
-		cmdBuffer := make([]byte, cmdSize)
-		_, err = conn.Read(cmdBuffer)
-		if err != nil {
-			log.Fatalf("Failed to read: %v", err)
-		}
-		cmd := &pb.Command{}
-		err = proto.Unmarshal(cmdBuffer, cmd)
-		if err != nil {
-			log.Fatalf("Failed to unmarshal command: %v", err)
-		}
-
 		switch cmd.Type {
-		case cmds.ECHO_CMD_TYPE:
-			log.Print("Received echo command.")
-			echoCmd := cmd.GetEchoCommandRequest()
-			log.Printf("Echo's text: '%s'", echoCmd.Text)
-			resp := &pb.EchoCommandResponse{Text: echoCmd.Text}
-			respBuffer, err := proto.Marshal(resp)
-			if err != nil {
-				log.Fatalf("Failed to marshal response: %v", err)
-			}
-			respBufferLen := int64(len(respBuffer))
-			err = binary.Write(conn, binary.LittleEndian, &respBufferLen)
-			if err != nil {
-				log.Fatalf("Failed to write: %v", err)
-			}
-			_, err = conn.Write(respBuffer)
-			if err != nil {
-				log.Fatalf("Failed to write: %v", err)
-			}
-			log.Print("Sent echo response.")
+		case pb.ECHO_CMD_TYPE:
+			resp := modules.RunEchoCommand(cmd.GetEchoCommandRequest())
+			controller.WriteCommandResponse(resp)
 		}
 	}
 }

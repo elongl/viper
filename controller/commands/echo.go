@@ -17,7 +17,7 @@ func (s *AgentManagerServer) RunEchoCommand(ctx context.Context, req *pb.EchoCom
 	if err != nil {
 		return nil, err
 	}
-	cmd := &pb.Command{Type: cmds.ECHO_CMD_TYPE, Command: &pb.Command_EchoCommandRequest{EchoCommandRequest: req}}
+	cmd := &pb.CommandRequest{Type: cmds.ECHO_CMD_TYPE, Req: &pb.CommandRequest_EchoCommandRequest{EchoCommandRequest: req}}
 	cmdBuffer, err := proto.Marshal(cmd)
 	if err != nil {
 		return nil, err
