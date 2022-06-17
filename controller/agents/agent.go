@@ -36,7 +36,21 @@ func InitAgent(conn net.Conn) {
 	agents = append(agents, agent)
 }
 
-func (agent *Agent) Read(resp proto.Message) error {
+func (agent *Agent) RunEchoCommand(req *pb.EchoCommandRequest) (*pb.EchoCommandResponse, error) {
+	cmdReq := &pb.CommandRequest{Type: pb.ECHO_CMD_TYPE, Req: &pb.CommandRequest_EchoCommandRequest{EchoCommandRequest: req}}
+	err := agent.write(cmdReq)
+	if err != nil {
+		return nil, err
+	}
+	resp := &pb.EchoCommandResponse{}
+	err = agent.read(resp)
+	if err != nil {
+		return nil, err
+	}
+	return resp, nil
+}
+
+func (agent *Agent) read(resp proto.Message) error {
 	var respSize int64
 	err := binary.Read(agent.conn, binary.LittleEndian, &respSize)
 	if err != nil {
@@ -54,7 +68,7 @@ func (agent *Agent) Read(resp proto.Message) error {
 	return nil
 }
 
-func (agent *Agent) Write(cmdReq *pb.CommandRequest) error {
+func (agent *Agent) write(cmdReq *pb.CommandRequest) error {
 	cmdBuffer, err := proto.Marshal(cmdReq)
 	if err != nil {
 		return err

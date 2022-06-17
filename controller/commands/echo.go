@@ -4,7 +4,6 @@ import (
 	"context"
 	"log"
 	"viper/controller/agents"
-	"viper/protos/cmds"
 	pb "viper/protos/cmds"
 )
 
@@ -14,13 +13,7 @@ func (s *AgentManagerServer) RunEchoCommand(ctx context.Context, req *pb.EchoCom
 	if err != nil {
 		return nil, err
 	}
-	cmdReq := &pb.CommandRequest{Type: cmds.ECHO_CMD_TYPE, Req: &pb.CommandRequest_EchoCommandRequest{EchoCommandRequest: req}}
-	err = agent.Write(cmdReq)
-	if err != nil {
-		return nil, err
-	}
-	resp := &pb.EchoCommandResponse{}
-	err = agent.Read(resp)
+	resp, err := agent.RunEchoCommand(req)
 	if err != nil {
 		return nil, err
 	}

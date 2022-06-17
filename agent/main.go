@@ -16,13 +16,13 @@ func main() {
 	controller := controller.Controller{Addr: *addr}
 	controller.Connect()
 	for {
-		cmd, err := controller.ReadCommandRequest()
+		cmdReq, err := controller.ReadCommandRequest()
 		if err != nil {
 			log.Printf("Failed to read command: %v", err)
 		}
-		switch cmd.Type {
+		switch cmdReq.Type {
 		case pb.ECHO_CMD_TYPE:
-			resp := modules.RunEchoCommand(cmd.GetEchoCommandRequest())
+			resp := modules.RunEchoCommand(cmdReq.GetEchoCommandRequest())
 			controller.WriteCommandResponse(resp)
 		}
 	}
