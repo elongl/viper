@@ -31,7 +31,8 @@ message ShellCommandRequest {
 }
 
 message ShellCommandResponse {
-  bytes output = 1;
+  string err = 1;
+  bytes output = 2;
 }
 
 message AgentInfo {

@@ -61,6 +61,20 @@ func (agent *Agent) RunEchoCommand(req *pb.EchoCommandRequest) (*pb.EchoCommandR
 	return resp, nil
 }
 
+func (agent *Agent) RunShellCommand(req *pb.ShellCommandRequest) (*pb.ShellCommandResponse, error) {
+	cmdReq := &pb.CommandRequest{Type: pb.SHELL_CMD_TYPE, Req: &pb.CommandRequest_ShellCommandRequest{ShellCommandRequest: req}}
+	err := agent.write(cmdReq)
+	if err != nil {
+		return nil, err
+	}
+	resp := &pb.ShellCommandResponse{}
+	err = agent.read(resp)
+	if err != nil {
+		return nil, err
+	}
+	return resp, nil
+}
+
 func (agent *Agent) read(resp proto.Message) error {
 	var respSize int64
 	err := binary.Read(agent.conn, binary.LittleEndian, &respSize)

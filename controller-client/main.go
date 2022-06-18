@@ -4,6 +4,7 @@ import (
 	"context"
 	"flag"
 	"log"
+	"strings"
 	"time"
 
 	pb "viper/protos/cmds"
@@ -31,4 +32,10 @@ func main() {
 		log.Fatalf("Failed to run command: %v", err)
 	}
 	log.Printf("Received echo response: '%s'", echoOutput.Text)
+
+	shellOutput, err := client.RunShellCommand(ctx, &pb.ShellCommandRequest{Cmd: "whoami", AgentId: 0})
+	if err != nil {
+		log.Fatalf("Failed to run command: %v", err)
+	}
+	log.Printf("Received shell response: '%s'", strings.TrimSpace(string(shellOutput.Output)))
 }
