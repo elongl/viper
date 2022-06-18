@@ -1,13 +1,3 @@
-'''
-Please launch this file with the following command:
-ipython -i main.py
-
-Example usage:
-agent = cnc.get_agent(agent_id=1)
-agent.shell('whoami')
-> 'root'
-'''
-
 from dataclasses import dataclass
 
 import grpc
