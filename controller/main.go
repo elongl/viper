@@ -19,7 +19,7 @@ var (
 )
 
 func runAgentServer() {
-	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", *agentServerPort))
+	lis, err := net.Listen("tcp", fmt.Sprintf("0.0.0.0:%d", *agentServerPort))
 	if err != nil {
 		log.Fatalf("Failed to listen: %v", err)
 	}
@@ -34,7 +34,7 @@ func runAgentServer() {
 }
 
 func runAgentManagerServer() {
-	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", *agentManagerServerPort))
+	lis, err := net.Listen("tcp", fmt.Sprintf("127.0.0.1:%d", *agentManagerServerPort))
 	if err != nil {
 		log.Fatalf("Failed to listen: %v", err)
 	}
