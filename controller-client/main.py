@@ -34,6 +34,9 @@ class Agent:
             raise errors.ShellCommandError(cmd, resp.err)
         return resp.output
 
+    def __repr__(self) -> str:
+        return f'Agent(id={self.id})'
+
 
 @dataclass
 class ControllerClient:
