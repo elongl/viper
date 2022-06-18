@@ -1,11 +1,14 @@
 package main
 
 import (
+	"crypto/tls"
+	"crypto/x509"
 	"flag"
 	"fmt"
 	"log"
 	"net"
 
+	_ "embed"
 	"viper/controller/agents"
 	"viper/controller/commands"
 	pb "viper/protos/cmds"
@@ -16,10 +19,27 @@ import (
 var (
 	agentServerPort        = flag.Int("port", 50051, "Agent server port")
 	agentManagerServerPort = flag.Int("management-port", 50052, "Agent management server port")
+
+	//go:embed certs/controller.cert
+	certBuffer []byte
+	//go:embed certs/controller.key
+	keyBuffer []byte
+	//go:embed certs/agent.cert
+	agentCertBuffer []byte
 )
 
 func runAgentServer() {
-	lis, err := net.Listen("tcp", fmt.Sprintf("0.0.0.0:%d", *agentServerPort))
+	cert, err := tls.X509KeyPair(certBuffer, keyBuffer)
+	if err != nil {
+		log.Fatalf("Failed to load certificate: %v", err)
+	}
+	caCertPool := x509.NewCertPool()
+	ok := caCertPool.AppendCertsFromPEM(agentCertBuffer)
+	if !ok {
+		log.Fatalf("Failed to parse agent's client certificate.")
+	}
+	tlsCfg := &tls.Config{Certificates: []tls.Certificate{cert}, ClientAuth: tls.RequireAndVerifyClientCert, ClientCAs: caCertPool}
+	lis, err := tls.Listen("tcp", fmt.Sprintf("0.0.0.0:%d", *agentServerPort), tlsCfg)
 	if err != nil {
 		log.Fatalf("Failed to listen: %v", err)
 	}

@@ -1,6 +1,8 @@
 package controller
 
 import (
+	"crypto/tls"
+	_ "embed"
 	"encoding/binary"
 	"io"
 	"log"
@@ -11,15 +13,27 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
+var (
+	//go:embed certs/agent.cert
+	certBuffer []byte
+	//go:embed certs/agent.key
+	keyBuffer []byte
+)
+
 type Controller struct {
 	Addr string
 	conn net.Conn
 }
 
 func (cnc *Controller) Connect() {
+	cert, err := tls.X509KeyPair(certBuffer, keyBuffer)
+	if err != nil {
+		log.Fatalf("Failed to load certificate: %v", err)
+	}
+	tlsCfg := &tls.Config{Certificates: []tls.Certificate{cert}, InsecureSkipVerify: true}
 	for {
 		log.Print("Connecting to controller.")
-		conn, err := net.Dial("tcp", cnc.Addr)
+		conn, err := tls.Dial("tcp", cnc.Addr, tlsCfg)
 		if err != nil {
 			log.Printf("Failed to connect to controller: %v", err)
 			time.Sleep(time.Minute * 1)

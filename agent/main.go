@@ -21,6 +21,7 @@ func main() {
 		cmdReq, err := controller.ReadCommandRequest()
 		if err != nil {
 			log.Printf("Failed to read command: %v", err)
+			continue
 		}
 		var resp proto.Message
 		switch cmdReq.Type {
