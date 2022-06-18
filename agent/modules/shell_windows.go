@@ -3,7 +3,7 @@ package modules
 import (
 	"log"
 	"os/exec"
-	"runtime"
+	"syscall"
 	pb "viper/protos/cmds"
 )
 
