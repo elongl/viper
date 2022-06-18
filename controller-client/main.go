@@ -26,7 +26,7 @@ func main() {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 
-	echoOutput, err := client.RunEchoCommand(ctx, &pb.EchoCommandRequest{Text: "Hello!", Hostname: "egk"})
+	echoOutput, err := client.RunEchoCommand(ctx, &pb.EchoCommandRequest{Text: "Hello!", AgentId: 0})
 	if err != nil {
 		log.Fatalf("Failed to run command: %v", err)
 	}
