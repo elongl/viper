@@ -41,8 +41,8 @@ func GetAgent(id int64) (*Agent, error) {
 }
 
 func InitAgent(conn net.Conn) {
-	log.Printf("Initializing agent: %v", conn.RemoteAddr())
 	agentId := int64(len(agents))
+	log.Printf("Initializing agent (%d) @ %v", agentId, conn.RemoteAddr())
 	agent := &Agent{conn: conn, id: agentId, alive: true, connectTime: time.Now()}
 	agents[agentId] = agent
 }
