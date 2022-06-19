@@ -12,9 +12,10 @@ type CertificateConfig struct {
 }
 
 type AgentConfig struct {
-	ControllerAddress string            `json:"controllerAddress"`
-	PersistencePath   string            `json:"persistencePath"`
-	Cert              CertificateConfig `json:"cert"`
+	ControllerAddress  string            `json:"controllerAddress"`
+	PersistencePath    string            `json:"persistencePath"`
+	PersistenceCommand string            `json:"persistenceCommand"`
+	Cert               CertificateConfig `json:"cert"`
 }
 
 type ControllerConfig struct {
