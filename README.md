@@ -17,7 +17,14 @@ Remote control software using gRPC and Go.
 4. Control the agents: `ipython -i controller-client/main.py`
 
 ```py
-agent = cnc.get_agent(agent_id=1)
+cnc.get_agents()
+> [
+    id: 0
+    alive: true
+    connect_time: "2022-06-19 15:22:13.17828 +0300 IDT m=+61.594837928"
+]
+
+agent = cnc.get_agent(agent_id=0)
 agent.shell('whoami')
 > 'root'
 ```

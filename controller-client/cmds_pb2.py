@@ -14,7 +14,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\ncmds.proto\"\x91\x01\n\x0e\x43ommandRequest\x12\x0c\n\x04type\x18\x01 \x01(\x03\x12\x33\n\x14\x65\x63ho_command_request\x18\x02 \x01(\x0b\x32\x13.EchoCommandRequestH\x00\x12\x35\n\x15shell_command_request\x18\x03 \x01(\x0b\x32\x14.ShellCommandRequestH\x00\x42\x05\n\x03req\"4\n\x12\x45\x63hoCommandRequest\x12\x10\n\x08\x61gent_id\x18\x01 \x01(\x03\x12\x0c\n\x04text\x18\x02 \x01(\t\"#\n\x13\x45\x63hoCommandResponse\x12\x0c\n\x04text\x18\x01 \x01(\t\"4\n\x13ShellCommandRequest\x12\x10\n\x08\x61gent_id\x18\x01 \x01(\x03\x12\x0b\n\x03\x63md\x18\x02 \x01(\t\"3\n\x14ShellCommandResponse\x12\x0b\n\x03\x65rr\x18\x01 \x01(\t\x12\x0e\n\x06output\x18\x02 \x01(\x0c\"/\n\tAgentInfo\x12\x10\n\x08\x61gent_id\x18\x01 \x01(\x03\x12\x10\n\x08hostname\x18\x02 \x01(\t\"\x07\n\x05\x45mpty2\xb4\x01\n\x0c\x41gentManager\x12=\n\x0eRunEchoCommand\x12\x13.EchoCommandRequest\x1a\x14.EchoCommandResponse\"\x00\x12@\n\x0fRunShellCommand\x12\x14.ShellCommandRequest\x1a\x15.ShellCommandResponse\"\x00\x12#\n\tGetAgents\x12\x06.Empty\x1a\n.AgentInfo\"\x00\x30\x01\x42\x08Z\x06./cmdsb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\ncmds.proto\"\x91\x01\n\x0e\x43ommandRequest\x12\x0c\n\x04type\x18\x01 \x01(\x03\x12\x33\n\x14\x65\x63ho_command_request\x18\x02 \x01(\x0b\x32\x13.EchoCommandRequestH\x00\x12\x35\n\x15shell_command_request\x18\x03 \x01(\x0b\x32\x14.ShellCommandRequestH\x00\x42\x05\n\x03req\"4\n\x12\x45\x63hoCommandRequest\x12\x10\n\x08\x61gent_id\x18\x01 \x01(\x03\x12\x0c\n\x04text\x18\x02 \x01(\t\"#\n\x13\x45\x63hoCommandResponse\x12\x0c\n\x04text\x18\x01 \x01(\t\"4\n\x13ShellCommandRequest\x12\x10\n\x08\x61gent_id\x18\x01 \x01(\x03\x12\x0b\n\x03\x63md\x18\x02 \x01(\t\"3\n\x14ShellCommandResponse\x12\x0b\n\x03\x65rr\x18\x01 \x01(\t\x12\x0e\n\x06output\x18\x02 \x01(\x0c\"<\n\tAgentInfo\x12\n\n\x02id\x18\x01 \x01(\x03\x12\r\n\x05\x61live\x18\x02 \x01(\x08\x12\x14\n\x0c\x63onnect_time\x18\x03 \x01(\t\"\x07\n\x05\x45mpty2\xb4\x01\n\x0c\x41gentManager\x12=\n\x0eRunEchoCommand\x12\x13.EchoCommandRequest\x1a\x14.EchoCommandResponse\"\x00\x12@\n\x0fRunShellCommand\x12\x14.ShellCommandRequest\x1a\x15.ShellCommandResponse\"\x00\x12#\n\tGetAgents\x12\x06.Empty\x1a\n.AgentInfo\"\x00\x30\x01\x42\x08Z\x06./cmdsb\x06proto3')
 
 
 
@@ -90,9 +90,9 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _SHELLCOMMANDRESPONSE._serialized_start=307
   _SHELLCOMMANDRESPONSE._serialized_end=358
   _AGENTINFO._serialized_start=360
-  _AGENTINFO._serialized_end=407
-  _EMPTY._serialized_start=409
-  _EMPTY._serialized_end=416
-  _AGENTMANAGER._serialized_start=419
-  _AGENTMANAGER._serialized_end=599
+  _AGENTINFO._serialized_end=420
+  _EMPTY._serialized_start=422
+  _EMPTY._serialized_end=429
+  _AGENTMANAGER._serialized_start=432
+  _AGENTMANAGER._serialized_end=612
 # @@protoc_insertion_point(module_scope)

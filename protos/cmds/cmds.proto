@@ -36,8 +36,9 @@ message ShellCommandResponse {
 }
 
 message AgentInfo {
-  int64 agent_id = 1;
-  string hostname = 2;
+  int64 id = 1;
+  bool alive = 2;
+  string connect_time = 3;
 }
 
 message Empty {}
