@@ -1,8 +1,8 @@
 package main
 
 import (
-	"flag"
 	"log"
+	"viper"
 	"viper/agent/controller"
 	"viper/agent/modules"
 	pb "viper/protos/cmds"
@@ -10,12 +10,8 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
-var (
-	addr = flag.String("addr", "localhost:50051", "The address to connect to.")
-)
-
 func main() {
-	controller := controller.Controller{Addr: *addr}
+	controller := controller.Controller{Addr: viper.Conf.Agent.ControllerAddress}
 	controller.Connect()
 	for {
 		cmdReq, err := controller.ReadCommandRequest()
