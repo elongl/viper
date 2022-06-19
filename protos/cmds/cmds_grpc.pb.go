@@ -24,6 +24,8 @@ const _ = grpc.SupportPackageIsVersion7
 type AgentManagerClient interface {
 	RunEchoCommand(ctx context.Context, in *EchoCommandRequest, opts ...grpc.CallOption) (*EchoCommandResponse, error)
 	RunShellCommand(ctx context.Context, in *ShellCommandRequest, opts ...grpc.CallOption) (*ShellCommandResponse, error)
+	UploadFile(ctx context.Context, in *UploadFileRequest, opts ...grpc.CallOption) (*UploadFileResponse, error)
+	DownloadFile(ctx context.Context, in *DownloadFileRequest, opts ...grpc.CallOption) (*DownloadFileResponse, error)
 	GetAgents(ctx context.Context, in *Empty, opts ...grpc.CallOption) (AgentManager_GetAgentsClient, error)
 }
 
@@ -47,6 +49,24 @@ func (c *agentManagerClient) RunEchoCommand(ctx context.Context, in *EchoCommand
 func (c *agentManagerClient) RunShellCommand(ctx context.Context, in *ShellCommandRequest, opts ...grpc.CallOption) (*ShellCommandResponse, error) {
 	out := new(ShellCommandResponse)
 	err := c.cc.Invoke(ctx, "/AgentManager/RunShellCommand", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *agentManagerClient) UploadFile(ctx context.Context, in *UploadFileRequest, opts ...grpc.CallOption) (*UploadFileResponse, error) {
+	out := new(UploadFileResponse)
+	err := c.cc.Invoke(ctx, "/AgentManager/UploadFile", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *agentManagerClient) DownloadFile(ctx context.Context, in *DownloadFileRequest, opts ...grpc.CallOption) (*DownloadFileResponse, error) {
+	out := new(DownloadFileResponse)
+	err := c.cc.Invoke(ctx, "/AgentManager/DownloadFile", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -91,6 +111,8 @@ func (x *agentManagerGetAgentsClient) Recv() (*AgentInfo, error) {
 type AgentManagerServer interface {
 	RunEchoCommand(context.Context, *EchoCommandRequest) (*EchoCommandResponse, error)
 	RunShellCommand(context.Context, *ShellCommandRequest) (*ShellCommandResponse, error)
+	UploadFile(context.Context, *UploadFileRequest) (*UploadFileResponse, error)
+	DownloadFile(context.Context, *DownloadFileRequest) (*DownloadFileResponse, error)
 	GetAgents(*Empty, AgentManager_GetAgentsServer) error
 	mustEmbedUnimplementedAgentManagerServer()
 }
@@ -104,6 +126,12 @@ func (UnimplementedAgentManagerServer) RunEchoCommand(context.Context, *EchoComm
 }
 func (UnimplementedAgentManagerServer) RunShellCommand(context.Context, *ShellCommandRequest) (*ShellCommandResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RunShellCommand not implemented")
+}
+func (UnimplementedAgentManagerServer) UploadFile(context.Context, *UploadFileRequest) (*UploadFileResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UploadFile not implemented")
+}
+func (UnimplementedAgentManagerServer) DownloadFile(context.Context, *DownloadFileRequest) (*DownloadFileResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DownloadFile not implemented")
 }
 func (UnimplementedAgentManagerServer) GetAgents(*Empty, AgentManager_GetAgentsServer) error {
 	return status.Errorf(codes.Unimplemented, "method GetAgents not implemented")
@@ -157,6 +185,42 @@ func _AgentManager_RunShellCommand_Handler(srv interface{}, ctx context.Context,
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AgentManager_UploadFile_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UploadFileRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AgentManagerServer).UploadFile(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/AgentManager/UploadFile",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AgentManagerServer).UploadFile(ctx, req.(*UploadFileRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AgentManager_DownloadFile_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DownloadFileRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AgentManagerServer).DownloadFile(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/AgentManager/DownloadFile",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AgentManagerServer).DownloadFile(ctx, req.(*DownloadFileRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _AgentManager_GetAgents_Handler(srv interface{}, stream grpc.ServerStream) error {
 	m := new(Empty)
 	if err := stream.RecvMsg(m); err != nil {
@@ -192,6 +256,14 @@ var AgentManager_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "RunShellCommand",
 			Handler:    _AgentManager_RunShellCommand_Handler,
+		},
+		{
+			MethodName: "UploadFile",
+			Handler:    _AgentManager_UploadFile_Handler,
+		},
+		{
+			MethodName: "DownloadFile",
+			Handler:    _AgentManager_DownloadFile_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{

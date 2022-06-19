@@ -14,10 +14,10 @@ import (
 )
 
 type Agent struct {
-	id          int64
-	alive       bool
+	Id          int64
+	Alive       bool
 	conn        net.Conn
-	connectTime time.Time
+	ConnectTime time.Time
 }
 
 const (
@@ -26,25 +26,25 @@ const (
 )
 
 var (
-	agents = make(map[int64]*Agent)
+	Agents = make(map[int64]*Agent)
 )
 
 func GetAgent(id int64) (*Agent, error) {
-	agent := agents[id]
+	agent := Agents[id]
 	if agent == nil {
 		return nil, errors.New(ERR_AGENT_NOT_FOUND)
 	}
-	if !agent.alive {
+	if !agent.Alive {
 		return nil, errors.New(ERR_AGENT_NO_LONGER_CONNECTED)
 	}
 	return agent, nil
 }
 
 func InitAgent(conn net.Conn) {
-	agentId := int64(len(agents))
+	agentId := int64(len(Agents))
 	log.Printf("Initializing agent (%d) @ %v", agentId, conn.RemoteAddr())
-	agent := &Agent{conn: conn, id: agentId, alive: true, connectTime: time.Now()}
-	agents[agentId] = agent
+	agent := &Agent{conn: conn, Id: agentId, Alive: true, ConnectTime: time.Now()}
+	Agents[agentId] = agent
 }
 
 func (agent *Agent) RunEchoCommand(req *pb.EchoCommandRequest) (*pb.EchoCommandResponse, error) {
@@ -127,7 +127,7 @@ func (agent *Agent) write(cmdReq *pb.CommandRequest) error {
 }
 
 func (agent *Agent) Close() {
-	log.Printf("Agent '%d' is no longer connected.", agent.id)
+	log.Printf("Agent '%d' is no longer connected.", agent.Id)
 	agent.conn.Close()
-	agent.alive = false
+	agent.Alive = false
 }

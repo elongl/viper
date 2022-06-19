@@ -5,6 +5,8 @@ option go_package = "./cmds";
 service AgentManager {
   rpc RunEchoCommand (EchoCommandRequest) returns (EchoCommandResponse) {}
   rpc RunShellCommand (ShellCommandRequest) returns (ShellCommandResponse) {}
+  rpc DownloadFile(DownloadFileRequest) returns (DownloadFileResponse) {}
+  rpc UploadFile(UploadFileRequest) returns (UploadFileResponse) {}
   rpc GetAgents(Empty) returns (stream AgentInfo) {}
 }
 
@@ -32,12 +34,33 @@ message ShellCommandRequest {
 
 message ShellCommandResponse {
   string err = 1;
-  bytes output = 2;
+  bytes data = 2;
+}
+
+message UploadFileRequest {
+  int64 agent_id = 1;
+  string path = 2;
+  bytes data = 3;
+}
+
+message UploadFileResponse {
+  string err = 1;
+}
+
+message DownloadFileRequest {
+  int64 agent_id = 1;
+  string path = 2;
+}
+
+message DownloadFileResponse {
+  string err = 1;
+  bytes data = 2;
 }
 
 message AgentInfo {
-  int64 agent_id = 1;
-  string hostname = 2;
+  int64 id = 1;
+  bool alive = 2;
+  string connect_time = 3;
 }
 
 message Empty {}

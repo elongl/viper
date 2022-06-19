@@ -16,5 +16,5 @@ func RunShellCommand(req *pb.ShellCommandRequest) *pb.ShellCommandResponse {
 		log.Printf("Failed to run shell command: %v", err)
 		return &pb.ShellCommandResponse{Err: err.Error()}
 	}
-	return &pb.ShellCommandResponse{Output: out}
+	return &pb.ShellCommandResponse{Data: out}
 }
