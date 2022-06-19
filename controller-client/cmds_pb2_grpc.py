@@ -24,15 +24,15 @@ class AgentManagerStub(object):
                 request_serializer=cmds__pb2.ShellCommandRequest.SerializeToString,
                 response_deserializer=cmds__pb2.ShellCommandResponse.FromString,
                 )
-        self.UploadFile = channel.unary_unary(
-                '/AgentManager/UploadFile',
-                request_serializer=cmds__pb2.UploadFileRequest.SerializeToString,
-                response_deserializer=cmds__pb2.UploadFileResponse.FromString,
-                )
         self.DownloadFile = channel.unary_unary(
                 '/AgentManager/DownloadFile',
                 request_serializer=cmds__pb2.DownloadFileRequest.SerializeToString,
                 response_deserializer=cmds__pb2.DownloadFileResponse.FromString,
+                )
+        self.UploadFile = channel.unary_unary(
+                '/AgentManager/UploadFile',
+                request_serializer=cmds__pb2.UploadFileRequest.SerializeToString,
+                response_deserializer=cmds__pb2.UploadFileResponse.FromString,
                 )
         self.GetAgents = channel.unary_stream(
                 '/AgentManager/GetAgents',
@@ -56,13 +56,13 @@ class AgentManagerServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
-    def UploadFile(self, request, context):
+    def DownloadFile(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
-    def DownloadFile(self, request, context):
+    def UploadFile(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -87,15 +87,15 @@ def add_AgentManagerServicer_to_server(servicer, server):
                     request_deserializer=cmds__pb2.ShellCommandRequest.FromString,
                     response_serializer=cmds__pb2.ShellCommandResponse.SerializeToString,
             ),
-            'UploadFile': grpc.unary_unary_rpc_method_handler(
-                    servicer.UploadFile,
-                    request_deserializer=cmds__pb2.UploadFileRequest.FromString,
-                    response_serializer=cmds__pb2.UploadFileResponse.SerializeToString,
-            ),
             'DownloadFile': grpc.unary_unary_rpc_method_handler(
                     servicer.DownloadFile,
                     request_deserializer=cmds__pb2.DownloadFileRequest.FromString,
                     response_serializer=cmds__pb2.DownloadFileResponse.SerializeToString,
+            ),
+            'UploadFile': grpc.unary_unary_rpc_method_handler(
+                    servicer.UploadFile,
+                    request_deserializer=cmds__pb2.UploadFileRequest.FromString,
+                    response_serializer=cmds__pb2.UploadFileResponse.SerializeToString,
             ),
             'GetAgents': grpc.unary_stream_rpc_method_handler(
                     servicer.GetAgents,
@@ -147,23 +147,6 @@ class AgentManager(object):
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
     @staticmethod
-    def UploadFile(request,
-            target,
-            options=(),
-            channel_credentials=None,
-            call_credentials=None,
-            insecure=False,
-            compression=None,
-            wait_for_ready=None,
-            timeout=None,
-            metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/AgentManager/UploadFile',
-            cmds__pb2.UploadFileRequest.SerializeToString,
-            cmds__pb2.UploadFileResponse.FromString,
-            options, channel_credentials,
-            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
-
-    @staticmethod
     def DownloadFile(request,
             target,
             options=(),
@@ -177,6 +160,23 @@ class AgentManager(object):
         return grpc.experimental.unary_unary(request, target, '/AgentManager/DownloadFile',
             cmds__pb2.DownloadFileRequest.SerializeToString,
             cmds__pb2.DownloadFileResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def UploadFile(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/AgentManager/UploadFile',
+            cmds__pb2.UploadFileRequest.SerializeToString,
+            cmds__pb2.UploadFileResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 

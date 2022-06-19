@@ -20,11 +20,11 @@ message CommandRequest {
 
 message EchoCommandRequest {
   int64 agent_id = 1;
-  string text = 2;
+  string data = 2;
 }
 
 message EchoCommandResponse {
-  string text = 1;
+  string data = 1;
 }
 
 message ShellCommandRequest {

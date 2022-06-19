@@ -12,10 +12,10 @@ class Agent:
     id: int
     _stub: cmds_pb2_grpc.AgentManagerStub
 
-    def echo(self, text: str) -> str:
-        req = cmds_pb2.EchoCommandRequest(agent_id=self.id, text=text)
+    def echo(self, data: str) -> str:
+        req = cmds_pb2.EchoCommandRequest(agent_id=self.id, data=data)
         resp = self._stub.RunEchoCommand(req)
-        return resp.text
+        return resp.data
 
     def shell(self, cmd: str, decode: bool = True) -> bytes:
         req = cmds_pb2.ShellCommandRequest(agent_id=self.id, cmd=cmd)
