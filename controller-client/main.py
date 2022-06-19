@@ -1,7 +1,7 @@
 from dataclasses import dataclass
+from typing import Union
 
 import grpc
-from typing import Union
 
 import cmds_pb2
 import cmds_pb2_grpc
@@ -66,5 +66,5 @@ class ControllerClient:
 
 
 if __name__ == '__main__':
-    cnc = ControllerClient('localhost:50052')
+    cnc = ControllerClient('localhost:8159')
     cnc.connect()
