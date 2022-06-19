@@ -25,6 +25,10 @@ func main() {
 			resp = modules.RunEchoCommand(cmdReq.GetEchoCommandRequest())
 		case pb.SHELL_CMD_TYPE:
 			resp = modules.RunShellCommand(cmdReq.GetShellCommandRequest())
+		case pb.UPLOAD_FILE_CMD_TYPE:
+			resp = modules.DownloadFileFromController(cmdReq.GetUploadFileRequest())
+		case pb.DOWNLOAD_FILE_CMD_TYPE:
+			resp = modules.UploadFileToController(cmdReq.GetDownloadFileRequest())
 		}
 		err = controller.WriteCommandResponse(resp)
 		if err != nil {

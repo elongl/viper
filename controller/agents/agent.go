@@ -75,6 +75,34 @@ func (agent *Agent) RunShellCommand(req *pb.ShellCommandRequest) (*pb.ShellComma
 	return resp, nil
 }
 
+func (agent *Agent) DownloadFile(req *pb.DownloadFileRequest) (*pb.DownloadFileResponse, error) {
+	cmdReq := &pb.CommandRequest{Type: pb.DOWNLOAD_FILE_CMD_TYPE, Req: &pb.CommandRequest_DownloadFileRequest{DownloadFileRequest: req}}
+	err := agent.write(cmdReq)
+	if err != nil {
+		return nil, err
+	}
+	resp := &pb.DownloadFileResponse{}
+	err = agent.read(resp)
+	if err != nil {
+		return nil, err
+	}
+	return resp, nil
+}
+
+func (agent *Agent) UploadFile(req *pb.UploadFileRequest) (*pb.UploadFileResponse, error) {
+	cmdReq := &pb.CommandRequest{Type: pb.UPLOAD_FILE_CMD_TYPE, Req: &pb.CommandRequest_UploadFileRequest{UploadFileRequest: req}}
+	err := agent.write(cmdReq)
+	if err != nil {
+		return nil, err
+	}
+	resp := &pb.UploadFileResponse{}
+	err = agent.read(resp)
+	if err != nil {
+		return nil, err
+	}
+	return resp, nil
+}
+
 func (agent *Agent) read(resp proto.Message) error {
 	var respSize int64
 	err := binary.Read(agent.conn, binary.LittleEndian, &respSize)
