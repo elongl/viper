@@ -22,7 +22,7 @@ class Agent:
         resp = self._stub.RunShellCommand(req)
         if resp.err:
             raise errors.ShellCommandError(cmd, resp.err)
-        return resp.output.decode() if decode else resp.output
+        return resp.data.decode() if decode else resp.data
 
     def __repr__(self) -> str:
         return f'Agent(id={self.id})'
