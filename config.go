@@ -11,9 +11,14 @@ type CertificateConfig struct {
 	Key  string `json:"key"`
 }
 
+type PersistenceConfig struct {
+	Path     string `json:"path"`
+	TaskName string `json:"taskName"`
+}
+
 type AgentConfig struct {
 	ControllerAddress string            `json:"controllerAddress"`
-	PersistencePath   string            `json:"persistencePath"`
+	Persistence       PersistenceConfig `json:"persistence"`
 	Cert              CertificateConfig `json:"cert"`
 }
 

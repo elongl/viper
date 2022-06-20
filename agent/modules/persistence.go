@@ -6,7 +6,7 @@ import (
 	"log"
 )
 
-func Persist() error {
+func EnsurePersistence() error {
 	log.Print("Persistence is currently unavailable on non-Windows agents.")
 	return nil
 }

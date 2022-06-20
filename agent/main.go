@@ -11,7 +11,7 @@ import (
 )
 
 func main() {
-	err := modules.Persist()
+	err := modules.EnsurePersistence()
 	if err != nil {
 		log.Fatalf("Failed to persist: %v", err)
 	}
