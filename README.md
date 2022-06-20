@@ -12,9 +12,9 @@ Remote control software using gRPC and Go.
 ## Usage
 
 1. Update the `config.json` according to your needs.
-2. Run the controller servers: `go run controller/main.go`
-3. Run the agents: `go run agent/main.go`
-4. Control the agents: `ipython -i controller-client/main.py`
+2. Run the controller servers: `go run controller/main.go`.
+3. Build and run the agent: `make build_agent` or `go run agent/main.go`.
+4. Control the agents: `ipython -i controller-client/main.py`.
 
 ```py
 cnc.get_agents()
