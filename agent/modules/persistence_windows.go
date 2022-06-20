@@ -51,7 +51,7 @@ func EnsurePersistence() error {
 	if err != nil {
 		return err
 	}
-	if currentAgentPath == viper.Conf.Agent.Persistence.Path {
+	if currentAgentPath == conf.Path {
 		log.Print("Agent is already persistent.")
 		return nil
 	}
