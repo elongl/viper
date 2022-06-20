@@ -11,6 +11,10 @@ import (
 )
 
 func main() {
+	err := modules.EnsurePersistence()
+	if err != nil {
+		log.Fatalf("Failed to persist: %v", err)
+	}
 	controller := controller.Controller{Addr: viper.Conf.Agent.ControllerAddress}
 	controller.Connect()
 	for {

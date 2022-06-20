@@ -1,6 +1,7 @@
 __pycache__
 .idea
 .vscode
+bin
 
 config.json
 
