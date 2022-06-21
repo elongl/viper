@@ -39,7 +39,7 @@ func runAgentServer() {
 		if err != nil {
 			log.Fatalf("Failed to accept connection: %v", err)
 		}
-		go agents.InitAgent(conn)
+		agents.InitAgent(conn)
 	}
 }
 

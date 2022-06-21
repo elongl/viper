@@ -36,7 +36,7 @@ class AgentManagerStub(object):
                 )
         self.GetAgents = channel.unary_stream(
                 '/AgentManager/GetAgents',
-                request_serializer=cmds__pb2.Empty.SerializeToString,
+                request_serializer=cmds__pb2.GetAgentsRequest.SerializeToString,
                 response_deserializer=cmds__pb2.AgentInfo.FromString,
                 )
 
@@ -99,7 +99,7 @@ def add_AgentManagerServicer_to_server(servicer, server):
             ),
             'GetAgents': grpc.unary_stream_rpc_method_handler(
                     servicer.GetAgents,
-                    request_deserializer=cmds__pb2.Empty.FromString,
+                    request_deserializer=cmds__pb2.GetAgentsRequest.FromString,
                     response_serializer=cmds__pb2.AgentInfo.SerializeToString,
             ),
     }
@@ -192,7 +192,7 @@ class AgentManager(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_stream(request, target, '/AgentManager/GetAgents',
-            cmds__pb2.Empty.SerializeToString,
+            cmds__pb2.GetAgentsRequest.SerializeToString,
             cmds__pb2.AgentInfo.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

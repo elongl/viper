@@ -8,7 +8,7 @@ import (
 )
 
 func (s *AgentManagerServer) DownloadFile(ctx context.Context, req *pb.DownloadFileRequest) (*pb.DownloadFileResponse, error) {
-	log.Printf("Downloading file '%s' from agent '%d'.", req.Path, req.AgentId)
+	log.Printf("Downloading file '%s' from agent (%d).", req.Path, req.AgentId)
 	agent, err := agents.GetAgent(req.AgentId)
 	if err != nil {
 		return nil, err
@@ -22,7 +22,7 @@ func (s *AgentManagerServer) DownloadFile(ctx context.Context, req *pb.DownloadF
 }
 
 func (s *AgentManagerServer) UploadFile(ctx context.Context, req *pb.UploadFileRequest) (*pb.UploadFileResponse, error) {
-	log.Printf("Uploading file '%s' to agent '%d'.", req.Path, req.AgentId)
+	log.Printf("Uploading file '%s' to agent (%d).", req.Path, req.AgentId)
 	agent, err := agents.GetAgent(req.AgentId)
 	if err != nil {
 		return nil, err

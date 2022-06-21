@@ -7,7 +7,7 @@ service AgentManager {
   rpc RunShellCommand (ShellCommandRequest) returns (ShellCommandResponse) {}
   rpc DownloadFile(DownloadFileRequest) returns (DownloadFileResponse) {}
   rpc UploadFile(UploadFileRequest) returns (UploadFileResponse) {}
-  rpc GetAgents(Empty) returns (stream AgentInfo) {}
+  rpc GetAgents(GetAgentsRequest) returns (stream AgentInfo) {}
 }
 
 message CommandRequest {
@@ -59,10 +59,12 @@ message UploadFileResponse {
   string err = 1;
 }
 
+message GetAgentsRequest {
+  bool alive_only = 1;
+}
+
 message AgentInfo {
   int64 id = 1;
   bool alive = 2;
   string connect_time = 3;
 }
-
-message Empty {}

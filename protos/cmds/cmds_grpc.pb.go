@@ -26,7 +26,7 @@ type AgentManagerClient interface {
 	RunShellCommand(ctx context.Context, in *ShellCommandRequest, opts ...grpc.CallOption) (*ShellCommandResponse, error)
 	DownloadFile(ctx context.Context, in *DownloadFileRequest, opts ...grpc.CallOption) (*DownloadFileResponse, error)
 	UploadFile(ctx context.Context, in *UploadFileRequest, opts ...grpc.CallOption) (*UploadFileResponse, error)
-	GetAgents(ctx context.Context, in *Empty, opts ...grpc.CallOption) (AgentManager_GetAgentsClient, error)
+	GetAgents(ctx context.Context, in *GetAgentsRequest, opts ...grpc.CallOption) (AgentManager_GetAgentsClient, error)
 }
 
 type agentManagerClient struct {
@@ -73,7 +73,7 @@ func (c *agentManagerClient) UploadFile(ctx context.Context, in *UploadFileReque
 	return out, nil
 }
 
-func (c *agentManagerClient) GetAgents(ctx context.Context, in *Empty, opts ...grpc.CallOption) (AgentManager_GetAgentsClient, error) {
+func (c *agentManagerClient) GetAgents(ctx context.Context, in *GetAgentsRequest, opts ...grpc.CallOption) (AgentManager_GetAgentsClient, error) {
 	stream, err := c.cc.NewStream(ctx, &AgentManager_ServiceDesc.Streams[0], "/AgentManager/GetAgents", opts...)
 	if err != nil {
 		return nil, err
@@ -113,7 +113,7 @@ type AgentManagerServer interface {
 	RunShellCommand(context.Context, *ShellCommandRequest) (*ShellCommandResponse, error)
 	DownloadFile(context.Context, *DownloadFileRequest) (*DownloadFileResponse, error)
 	UploadFile(context.Context, *UploadFileRequest) (*UploadFileResponse, error)
-	GetAgents(*Empty, AgentManager_GetAgentsServer) error
+	GetAgents(*GetAgentsRequest, AgentManager_GetAgentsServer) error
 	mustEmbedUnimplementedAgentManagerServer()
 }
 
@@ -133,7 +133,7 @@ func (UnimplementedAgentManagerServer) DownloadFile(context.Context, *DownloadFi
 func (UnimplementedAgentManagerServer) UploadFile(context.Context, *UploadFileRequest) (*UploadFileResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UploadFile not implemented")
 }
-func (UnimplementedAgentManagerServer) GetAgents(*Empty, AgentManager_GetAgentsServer) error {
+func (UnimplementedAgentManagerServer) GetAgents(*GetAgentsRequest, AgentManager_GetAgentsServer) error {
 	return status.Errorf(codes.Unimplemented, "method GetAgents not implemented")
 }
 func (UnimplementedAgentManagerServer) mustEmbedUnimplementedAgentManagerServer() {}
@@ -222,7 +222,7 @@ func _AgentManager_UploadFile_Handler(srv interface{}, ctx context.Context, dec 
 }
 
 func _AgentManager_GetAgents_Handler(srv interface{}, stream grpc.ServerStream) error {
-	m := new(Empty)
+	m := new(GetAgentsRequest)
 	if err := stream.RecvMsg(m); err != nil {
 		return err
 	}

@@ -3,6 +3,7 @@ package agents
 import (
 	"encoding/binary"
 	"errors"
+	"fmt"
 	"io"
 	"log"
 	"net"
@@ -15,14 +16,14 @@ import (
 
 type Agent struct {
 	Id          int64
-	Alive       bool
+	alive       bool
 	conn        net.Conn
 	ConnectTime time.Time
 }
 
 const (
-	ERR_AGENT_NO_LONGER_CONNECTED = "Agent no longer connected."
-	ERR_AGENT_NOT_FOUND           = "Agent not found."
+	ERR_AGENT_DISCONNECTED = "Agent (%d) has disconnected."
+	ERR_AGENT_NOT_FOUND    = "Agent not found."
 )
 
 var (
@@ -34,17 +35,33 @@ func GetAgent(id int64) (*Agent, error) {
 	if agent == nil {
 		return nil, errors.New(ERR_AGENT_NOT_FOUND)
 	}
-	if !agent.Alive {
-		return nil, errors.New(ERR_AGENT_NO_LONGER_CONNECTED)
+	if !agent.IsAlive() {
+		return nil, fmt.Errorf(ERR_AGENT_DISCONNECTED, id)
 	}
 	return agent, nil
 }
 
 func InitAgent(conn net.Conn) {
+	log.Printf("Received connection @ %v", conn.RemoteAddr())
 	agentId := int64(len(Agents))
+	agent := &Agent{conn: conn, Id: agentId, ConnectTime: time.Now()}
+	validAgent := agent.IsAlive()
+	if !validAgent {
+		log.Print("Connection is not an agent.")
+		conn.Close()
+		return
+	}
 	log.Printf("Initializing agent (%d) @ %v", agentId, conn.RemoteAddr())
-	agent := &Agent{conn: conn, Id: agentId, Alive: true, ConnectTime: time.Now()}
 	Agents[agentId] = agent
+}
+
+func (agent *Agent) IsAlive() bool {
+	if !agent.alive {
+		return false
+	}
+	cmdReq := &pb.EchoCommandRequest{Data: "ping"}
+	_, err := agent.RunEchoCommand(cmdReq)
+	return err == nil
 }
 
 func (agent *Agent) RunEchoCommand(req *pb.EchoCommandRequest) (*pb.EchoCommandResponse, error) {
@@ -108,7 +125,7 @@ func (agent *Agent) read(resp proto.Message) error {
 	err := binary.Read(agent.conn, binary.LittleEndian, &respSize)
 	if err == io.EOF {
 		agent.Close()
-		return errors.New(ERR_AGENT_NO_LONGER_CONNECTED)
+		return fmt.Errorf(ERR_AGENT_DISCONNECTED, agent.Id)
 	}
 	if err != nil {
 		return err
@@ -117,7 +134,7 @@ func (agent *Agent) read(resp proto.Message) error {
 	_, err = agent.conn.Read(respBuffer)
 	if err == io.EOF {
 		agent.Close()
-		return errors.New(ERR_AGENT_NO_LONGER_CONNECTED)
+		return fmt.Errorf(ERR_AGENT_DISCONNECTED, agent.Id)
 	}
 	if err != nil {
 		return err
@@ -138,7 +155,7 @@ func (agent *Agent) write(cmdReq *pb.CommandRequest) error {
 	err = binary.Write(agent.conn, binary.LittleEndian, &cmdBufferLen)
 	if err == io.EOF {
 		agent.Close()
-		return errors.New(ERR_AGENT_NO_LONGER_CONNECTED)
+		return fmt.Errorf(ERR_AGENT_DISCONNECTED, agent.Id)
 	}
 	if err != nil {
 		return err
@@ -146,7 +163,7 @@ func (agent *Agent) write(cmdReq *pb.CommandRequest) error {
 	_, err = agent.conn.Write(cmdBuffer)
 	if err == io.EOF {
 		agent.Close()
-		return errors.New(ERR_AGENT_NO_LONGER_CONNECTED)
+		return fmt.Errorf(ERR_AGENT_DISCONNECTED, agent.Id)
 	}
 	if err != nil {
 		return err
@@ -155,7 +172,11 @@ func (agent *Agent) write(cmdReq *pb.CommandRequest) error {
 }
 
 func (agent *Agent) Close() {
-	log.Printf("Agent '%d' is no longer connected.", agent.Id)
+	if !agent.alive {
+		log.Printf("Agent (%d) already closed.", agent.Id)
+		return
+	}
+	log.Printf("Agent (%d) has disconnected.", agent.Id)
 	agent.conn.Close()
-	agent.Alive = false
+	agent.alive = false
 }

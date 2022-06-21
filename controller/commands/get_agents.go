@@ -6,10 +6,14 @@ import (
 	pb "viper/protos/cmds"
 )
 
-func (s *AgentManagerServer) GetAgents(req *pb.Empty, stream pb.AgentManager_GetAgentsServer) error {
+func (s *AgentManagerServer) GetAgents(req *pb.GetAgentsRequest, stream pb.AgentManager_GetAgentsServer) error {
 	log.Printf("Getting the agents.")
 	for _, agent := range agents.Agents {
-		err := stream.Send(&pb.AgentInfo{Id: agent.Id, Alive: agent.Alive, ConnectTime: agent.ConnectTime.String()})
+		agentAlive := agent.IsAlive()
+		if req.AliveOnly && !agentAlive {
+			continue
+		}
+		err := stream.Send(&pb.AgentInfo{Id: agent.Id, Alive: agentAlive, ConnectTime: agent.ConnectTime.String()})
 		if err != nil {
 			return err
 		}
