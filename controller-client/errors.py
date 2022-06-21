@@ -10,6 +10,7 @@ class ShellCommandError(CommandError):
     def __init__(self, cmd: str, err_msg: str, data: bytes):
         self.cmd = cmd
         self.err_msg = err_msg
+        self.data = data
         super().__init__(
             f'Failed to execute shell command "{cmd}": {err_msg} ; {data}')
 
