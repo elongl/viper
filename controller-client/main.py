@@ -7,7 +7,6 @@ import grpc
 
 import cmds_pb2
 import cmds_pb2_grpc
-import errors
 
 _PRODUCTS_DIR_PATH = Path(__file__).parent / "products"
 
@@ -25,15 +24,11 @@ class Agent:
     def shell(self, cmd: str, decode: bool = True) -> bytes:
         req = cmds_pb2.ShellCommandRequest(agent_id=self.id, cmd=cmd)
         resp = self._stub.RunShellCommand(req)
-        if resp.err:
-            raise errors.ShellCommandError(cmd, resp.err, resp.data)
         return resp.data.decode() if decode else resp.data
 
     def screenshot(self, local_path_to_save: str = None) -> None:
         req = cmds_pb2.ScreenshotRequest(agent_id=self.id)
         resp = self._stub.Screenshot(req)
-        if resp.err:
-            raise errors.ScreenshotError(resp.err)
         output_path = local_path_to_save or Path(
             _PRODUCTS_DIR_PATH, f'screenshot_agent_{self.id}_{datetime.now().isoformat()}.png')
         with open(output_path, 'wb') as screenshot_file:
@@ -43,8 +38,6 @@ class Agent:
     def download_file(self, remote_path: str, local_path: str = None) -> Union[bytes, None]:
         req = cmds_pb2.DownloadFileRequest(agent_id=self.id, path=remote_path)
         resp = self._stub.DownloadFile(req)
-        if resp.err:
-            raise errors.DownloadFileError(remote_path, resp.err)
         if local_path:
             with open(local_path, 'wb') as downloaded_file:
                 downloaded_file.write(resp.data)
@@ -57,8 +50,6 @@ class Agent:
         req = cmds_pb2.UploadFileRequest(
             agent_id=self.id, path=remote_path, data=data)
         resp = self._stub.UploadFile(req)
-        if resp.err:
-            raise errors.UploadFileError(remote_path, resp.err)
 
     def __repr__(self) -> str:
         return f'Agent(id={self.id})'

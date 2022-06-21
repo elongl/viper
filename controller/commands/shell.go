@@ -2,6 +2,7 @@ package commands
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"viper/controller/agents"
 	pb "viper/protos/cmds"
@@ -16,6 +17,9 @@ func (s *AgentManagerServer) RunShellCommand(ctx context.Context, req *pb.ShellC
 	resp, err := agent.RunShellCommand(req)
 	if err != nil {
 		return nil, err
+	}
+	if resp.Err != "" {
+		return nil, fmt.Errorf("Failed to run shell command: %v : %s", resp.Err, resp.Data)
 	}
 	log.Printf("Received shell response.")
 	return resp, nil
