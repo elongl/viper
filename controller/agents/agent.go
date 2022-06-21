@@ -44,7 +44,7 @@ func GetAgent(id int64) (*Agent, error) {
 func InitAgent(conn net.Conn) {
 	log.Printf("Received connection @ %v", conn.RemoteAddr())
 	agentId := int64(len(Agents))
-	agent := &Agent{conn: conn, Id: agentId, ConnectTime: time.Now()}
+	agent := &Agent{conn: conn, alive: true, Id: agentId, ConnectTime: time.Now()}
 	validAgent := agent.IsAlive()
 	if !validAgent {
 		log.Print("Connection is not an agent.")
@@ -59,8 +59,7 @@ func (agent *Agent) IsAlive() bool {
 	if !agent.alive {
 		return false
 	}
-	cmdReq := &pb.EchoCommandRequest{Data: "ping"}
-	_, err := agent.RunEchoCommand(cmdReq)
+	_, err := agent.RunEchoCommand(&pb.EchoCommandRequest{Data: "ping"})
 	return err == nil
 }
 
