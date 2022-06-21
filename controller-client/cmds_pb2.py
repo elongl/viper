@@ -14,7 +14,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\ncmds.proto\"\xfb\x01\n\x0e\x43ommandRequest\x12\x0c\n\x04type\x18\x01 \x01(\x03\x12\x33\n\x14\x65\x63ho_command_request\x18\x02 \x01(\x0b\x32\x13.EchoCommandRequestH\x00\x12\x35\n\x15shell_command_request\x18\x03 \x01(\x0b\x32\x14.ShellCommandRequestH\x00\x12\x35\n\x15\x64ownload_file_request\x18\x04 \x01(\x0b\x32\x14.DownloadFileRequestH\x00\x12\x31\n\x13upload_file_request\x18\x05 \x01(\x0b\x32\x12.UploadFileRequestH\x00\x42\x05\n\x03req\"4\n\x12\x45\x63hoCommandRequest\x12\x10\n\x08\x61gent_id\x18\x01 \x01(\x03\x12\x0c\n\x04\x64\x61ta\x18\x02 \x01(\t\"#\n\x13\x45\x63hoCommandResponse\x12\x0c\n\x04\x64\x61ta\x18\x01 \x01(\t\"4\n\x13ShellCommandRequest\x12\x10\n\x08\x61gent_id\x18\x01 \x01(\x03\x12\x0b\n\x03\x63md\x18\x02 \x01(\t\"1\n\x14ShellCommandResponse\x12\x0b\n\x03\x65rr\x18\x01 \x01(\t\x12\x0c\n\x04\x64\x61ta\x18\x02 \x01(\x0c\"5\n\x13\x44ownloadFileRequest\x12\x10\n\x08\x61gent_id\x18\x01 \x01(\x03\x12\x0c\n\x04path\x18\x02 \x01(\t\"1\n\x14\x44ownloadFileResponse\x12\x0b\n\x03\x65rr\x18\x01 \x01(\t\x12\x0c\n\x04\x64\x61ta\x18\x02 \x01(\x0c\"A\n\x11UploadFileRequest\x12\x10\n\x08\x61gent_id\x18\x01 \x01(\x03\x12\x0c\n\x04path\x18\x02 \x01(\t\x12\x0c\n\x04\x64\x61ta\x18\x03 \x01(\x0c\"!\n\x12UploadFileResponse\x12\x0b\n\x03\x65rr\x18\x01 \x01(\t\"&\n\x10GetAgentsRequest\x12\x12\n\nalive_only\x18\x01 \x01(\x08\"<\n\tAgentInfo\x12\n\n\x02id\x18\x01 \x01(\x03\x12\r\n\x05\x61live\x18\x02 \x01(\x08\x12\x14\n\x0c\x63onnect_time\x18\x03 \x01(\t2\xb7\x02\n\x0c\x41gentManager\x12=\n\x0eRunEchoCommand\x12\x13.EchoCommandRequest\x1a\x14.EchoCommandResponse\"\x00\x12@\n\x0fRunShellCommand\x12\x14.ShellCommandRequest\x1a\x15.ShellCommandResponse\"\x00\x12=\n\x0c\x44ownloadFile\x12\x14.DownloadFileRequest\x1a\x15.DownloadFileResponse\"\x00\x12\x37\n\nUploadFile\x12\x12.UploadFileRequest\x1a\x13.UploadFileResponse\"\x00\x12.\n\tGetAgents\x12\x11.GetAgentsRequest\x1a\n.AgentInfo\"\x00\x30\x01\x42\x08Z\x06./cmdsb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\ncmds.proto\"\xad\x02\n\x0e\x43ommandRequest\x12\x0c\n\x04type\x18\x01 \x01(\x03\x12\x33\n\x14\x65\x63ho_command_request\x18\x02 \x01(\x0b\x32\x13.EchoCommandRequestH\x00\x12\x35\n\x15shell_command_request\x18\x03 \x01(\x0b\x32\x14.ShellCommandRequestH\x00\x12\x35\n\x15\x64ownload_file_request\x18\x04 \x01(\x0b\x32\x14.DownloadFileRequestH\x00\x12\x31\n\x13upload_file_request\x18\x05 \x01(\x0b\x32\x12.UploadFileRequestH\x00\x12\x30\n\x12screenshot_request\x18\x06 \x01(\x0b\x32\x12.ScreenshotRequestH\x00\x42\x05\n\x03req\"4\n\x12\x45\x63hoCommandRequest\x12\x10\n\x08\x61gent_id\x18\x01 \x01(\x03\x12\x0c\n\x04\x64\x61ta\x18\x02 \x01(\t\"#\n\x13\x45\x63hoCommandResponse\x12\x0c\n\x04\x64\x61ta\x18\x01 \x01(\t\"4\n\x13ShellCommandRequest\x12\x10\n\x08\x61gent_id\x18\x01 \x01(\x03\x12\x0b\n\x03\x63md\x18\x02 \x01(\t\"1\n\x14ShellCommandResponse\x12\x0b\n\x03\x65rr\x18\x01 \x01(\t\x12\x0c\n\x04\x64\x61ta\x18\x02 \x01(\x0c\"5\n\x13\x44ownloadFileRequest\x12\x10\n\x08\x61gent_id\x18\x01 \x01(\x03\x12\x0c\n\x04path\x18\x02 \x01(\t\"1\n\x14\x44ownloadFileResponse\x12\x0b\n\x03\x65rr\x18\x01 \x01(\t\x12\x0c\n\x04\x64\x61ta\x18\x02 \x01(\x0c\"A\n\x11UploadFileRequest\x12\x10\n\x08\x61gent_id\x18\x01 \x01(\x03\x12\x0c\n\x04path\x18\x02 \x01(\t\x12\x0c\n\x04\x64\x61ta\x18\x03 \x01(\x0c\"!\n\x12UploadFileResponse\x12\x0b\n\x03\x65rr\x18\x01 \x01(\t\"%\n\x11ScreenshotRequest\x12\x10\n\x08\x61gent_id\x18\x01 \x01(\x03\"/\n\x12ScreenshotResponse\x12\x0b\n\x03\x65rr\x18\x01 \x01(\t\x12\x0c\n\x04\x64\x61ta\x18\x02 \x01(\x0c\"&\n\x10GetAgentsRequest\x12\x12\n\nalive_only\x18\x01 \x01(\x08\"<\n\tAgentInfo\x12\n\n\x02id\x18\x01 \x01(\x03\x12\r\n\x05\x61live\x18\x02 \x01(\x08\x12\x14\n\x0c\x63onnect_time\x18\x03 \x01(\t2\xf0\x02\n\x0c\x41gentManager\x12=\n\x0eRunEchoCommand\x12\x13.EchoCommandRequest\x1a\x14.EchoCommandResponse\"\x00\x12@\n\x0fRunShellCommand\x12\x14.ShellCommandRequest\x1a\x15.ShellCommandResponse\"\x00\x12=\n\x0c\x44ownloadFile\x12\x14.DownloadFileRequest\x1a\x15.DownloadFileResponse\"\x00\x12\x37\n\nUploadFile\x12\x12.UploadFileRequest\x1a\x13.UploadFileResponse\"\x00\x12\x37\n\nScreenshot\x12\x12.ScreenshotRequest\x1a\x13.ScreenshotResponse\"\x00\x12.\n\tGetAgents\x12\x11.GetAgentsRequest\x1a\n.AgentInfo\"\x00\x30\x01\x42\x08Z\x06./cmdsb\x06proto3')
 
 
 
@@ -27,6 +27,8 @@ _DOWNLOADFILEREQUEST = DESCRIPTOR.message_types_by_name['DownloadFileRequest']
 _DOWNLOADFILERESPONSE = DESCRIPTOR.message_types_by_name['DownloadFileResponse']
 _UPLOADFILEREQUEST = DESCRIPTOR.message_types_by_name['UploadFileRequest']
 _UPLOADFILERESPONSE = DESCRIPTOR.message_types_by_name['UploadFileResponse']
+_SCREENSHOTREQUEST = DESCRIPTOR.message_types_by_name['ScreenshotRequest']
+_SCREENSHOTRESPONSE = DESCRIPTOR.message_types_by_name['ScreenshotResponse']
 _GETAGENTSREQUEST = DESCRIPTOR.message_types_by_name['GetAgentsRequest']
 _AGENTINFO = DESCRIPTOR.message_types_by_name['AgentInfo']
 CommandRequest = _reflection.GeneratedProtocolMessageType('CommandRequest', (_message.Message,), {
@@ -92,6 +94,20 @@ UploadFileResponse = _reflection.GeneratedProtocolMessageType('UploadFileRespons
   })
 _sym_db.RegisterMessage(UploadFileResponse)
 
+ScreenshotRequest = _reflection.GeneratedProtocolMessageType('ScreenshotRequest', (_message.Message,), {
+  'DESCRIPTOR' : _SCREENSHOTREQUEST,
+  '__module__' : 'cmds_pb2'
+  # @@protoc_insertion_point(class_scope:ScreenshotRequest)
+  })
+_sym_db.RegisterMessage(ScreenshotRequest)
+
+ScreenshotResponse = _reflection.GeneratedProtocolMessageType('ScreenshotResponse', (_message.Message,), {
+  'DESCRIPTOR' : _SCREENSHOTRESPONSE,
+  '__module__' : 'cmds_pb2'
+  # @@protoc_insertion_point(class_scope:ScreenshotResponse)
+  })
+_sym_db.RegisterMessage(ScreenshotResponse)
+
 GetAgentsRequest = _reflection.GeneratedProtocolMessageType('GetAgentsRequest', (_message.Message,), {
   'DESCRIPTOR' : _GETAGENTSREQUEST,
   '__module__' : 'cmds_pb2'
@@ -112,27 +128,31 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   DESCRIPTOR._options = None
   DESCRIPTOR._serialized_options = b'Z\006./cmds'
   _COMMANDREQUEST._serialized_start=15
-  _COMMANDREQUEST._serialized_end=266
-  _ECHOCOMMANDREQUEST._serialized_start=268
-  _ECHOCOMMANDREQUEST._serialized_end=320
-  _ECHOCOMMANDRESPONSE._serialized_start=322
-  _ECHOCOMMANDRESPONSE._serialized_end=357
-  _SHELLCOMMANDREQUEST._serialized_start=359
-  _SHELLCOMMANDREQUEST._serialized_end=411
-  _SHELLCOMMANDRESPONSE._serialized_start=413
-  _SHELLCOMMANDRESPONSE._serialized_end=462
-  _DOWNLOADFILEREQUEST._serialized_start=464
-  _DOWNLOADFILEREQUEST._serialized_end=517
-  _DOWNLOADFILERESPONSE._serialized_start=519
-  _DOWNLOADFILERESPONSE._serialized_end=568
-  _UPLOADFILEREQUEST._serialized_start=570
-  _UPLOADFILEREQUEST._serialized_end=635
-  _UPLOADFILERESPONSE._serialized_start=637
-  _UPLOADFILERESPONSE._serialized_end=670
-  _GETAGENTSREQUEST._serialized_start=672
-  _GETAGENTSREQUEST._serialized_end=710
-  _AGENTINFO._serialized_start=712
-  _AGENTINFO._serialized_end=772
-  _AGENTMANAGER._serialized_start=775
-  _AGENTMANAGER._serialized_end=1086
+  _COMMANDREQUEST._serialized_end=316
+  _ECHOCOMMANDREQUEST._serialized_start=318
+  _ECHOCOMMANDREQUEST._serialized_end=370
+  _ECHOCOMMANDRESPONSE._serialized_start=372
+  _ECHOCOMMANDRESPONSE._serialized_end=407
+  _SHELLCOMMANDREQUEST._serialized_start=409
+  _SHELLCOMMANDREQUEST._serialized_end=461
+  _SHELLCOMMANDRESPONSE._serialized_start=463
+  _SHELLCOMMANDRESPONSE._serialized_end=512
+  _DOWNLOADFILEREQUEST._serialized_start=514
+  _DOWNLOADFILEREQUEST._serialized_end=567
+  _DOWNLOADFILERESPONSE._serialized_start=569
+  _DOWNLOADFILERESPONSE._serialized_end=618
+  _UPLOADFILEREQUEST._serialized_start=620
+  _UPLOADFILEREQUEST._serialized_end=685
+  _UPLOADFILERESPONSE._serialized_start=687
+  _UPLOADFILERESPONSE._serialized_end=720
+  _SCREENSHOTREQUEST._serialized_start=722
+  _SCREENSHOTREQUEST._serialized_end=759
+  _SCREENSHOTRESPONSE._serialized_start=761
+  _SCREENSHOTRESPONSE._serialized_end=808
+  _GETAGENTSREQUEST._serialized_start=810
+  _GETAGENTSREQUEST._serialized_end=848
+  _AGENTINFO._serialized_start=850
+  _AGENTINFO._serialized_end=910
+  _AGENTMANAGER._serialized_start=913
+  _AGENTMANAGER._serialized_end=1281
 # @@protoc_insertion_point(module_scope)

@@ -26,6 +26,7 @@ type AgentManagerClient interface {
 	RunShellCommand(ctx context.Context, in *ShellCommandRequest, opts ...grpc.CallOption) (*ShellCommandResponse, error)
 	DownloadFile(ctx context.Context, in *DownloadFileRequest, opts ...grpc.CallOption) (*DownloadFileResponse, error)
 	UploadFile(ctx context.Context, in *UploadFileRequest, opts ...grpc.CallOption) (*UploadFileResponse, error)
+	Screenshot(ctx context.Context, in *ScreenshotRequest, opts ...grpc.CallOption) (*ScreenshotResponse, error)
 	GetAgents(ctx context.Context, in *GetAgentsRequest, opts ...grpc.CallOption) (AgentManager_GetAgentsClient, error)
 }
 
@@ -73,6 +74,15 @@ func (c *agentManagerClient) UploadFile(ctx context.Context, in *UploadFileReque
 	return out, nil
 }
 
+func (c *agentManagerClient) Screenshot(ctx context.Context, in *ScreenshotRequest, opts ...grpc.CallOption) (*ScreenshotResponse, error) {
+	out := new(ScreenshotResponse)
+	err := c.cc.Invoke(ctx, "/AgentManager/Screenshot", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *agentManagerClient) GetAgents(ctx context.Context, in *GetAgentsRequest, opts ...grpc.CallOption) (AgentManager_GetAgentsClient, error) {
 	stream, err := c.cc.NewStream(ctx, &AgentManager_ServiceDesc.Streams[0], "/AgentManager/GetAgents", opts...)
 	if err != nil {
@@ -113,6 +123,7 @@ type AgentManagerServer interface {
 	RunShellCommand(context.Context, *ShellCommandRequest) (*ShellCommandResponse, error)
 	DownloadFile(context.Context, *DownloadFileRequest) (*DownloadFileResponse, error)
 	UploadFile(context.Context, *UploadFileRequest) (*UploadFileResponse, error)
+	Screenshot(context.Context, *ScreenshotRequest) (*ScreenshotResponse, error)
 	GetAgents(*GetAgentsRequest, AgentManager_GetAgentsServer) error
 	mustEmbedUnimplementedAgentManagerServer()
 }
@@ -132,6 +143,9 @@ func (UnimplementedAgentManagerServer) DownloadFile(context.Context, *DownloadFi
 }
 func (UnimplementedAgentManagerServer) UploadFile(context.Context, *UploadFileRequest) (*UploadFileResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UploadFile not implemented")
+}
+func (UnimplementedAgentManagerServer) Screenshot(context.Context, *ScreenshotRequest) (*ScreenshotResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Screenshot not implemented")
 }
 func (UnimplementedAgentManagerServer) GetAgents(*GetAgentsRequest, AgentManager_GetAgentsServer) error {
 	return status.Errorf(codes.Unimplemented, "method GetAgents not implemented")
@@ -221,6 +235,24 @@ func _AgentManager_UploadFile_Handler(srv interface{}, ctx context.Context, dec 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AgentManager_Screenshot_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ScreenshotRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AgentManagerServer).Screenshot(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/AgentManager/Screenshot",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AgentManagerServer).Screenshot(ctx, req.(*ScreenshotRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _AgentManager_GetAgents_Handler(srv interface{}, stream grpc.ServerStream) error {
 	m := new(GetAgentsRequest)
 	if err := stream.RecvMsg(m); err != nil {
@@ -264,6 +296,10 @@ var AgentManager_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "UploadFile",
 			Handler:    _AgentManager_UploadFile_Handler,
+		},
+		{
+			MethodName: "Screenshot",
+			Handler:    _AgentManager_Screenshot_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{

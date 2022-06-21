@@ -63,6 +63,20 @@ func (agent *Agent) IsAlive() bool {
 	return err == nil
 }
 
+func (agent *Agent) Screenshot(req *pb.ScreenshotRequest) (*pb.ScreenshotResponse, error) {
+	cmdReq := &pb.CommandRequest{Type: pb.SCREENSHOT_CMD_TYPE, Req: &pb.CommandRequest_ScreenshotRequest{ScreenshotRequest: req}}
+	err := agent.write(cmdReq)
+	if err != nil {
+		return nil, err
+	}
+	resp := &pb.ScreenshotResponse{}
+	err = agent.read(resp)
+	if err != nil {
+		return nil, err
+	}
+	return resp, nil
+}
+
 func (agent *Agent) RunEchoCommand(req *pb.EchoCommandRequest) (*pb.EchoCommandResponse, error) {
 	cmdReq := &pb.CommandRequest{Type: pb.ECHO_CMD_TYPE, Req: &pb.CommandRequest_EchoCommandRequest{EchoCommandRequest: req}}
 	err := agent.write(cmdReq)

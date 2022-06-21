@@ -34,6 +34,11 @@ class AgentManagerStub(object):
                 request_serializer=cmds__pb2.UploadFileRequest.SerializeToString,
                 response_deserializer=cmds__pb2.UploadFileResponse.FromString,
                 )
+        self.Screenshot = channel.unary_unary(
+                '/AgentManager/Screenshot',
+                request_serializer=cmds__pb2.ScreenshotRequest.SerializeToString,
+                response_deserializer=cmds__pb2.ScreenshotResponse.FromString,
+                )
         self.GetAgents = channel.unary_stream(
                 '/AgentManager/GetAgents',
                 request_serializer=cmds__pb2.GetAgentsRequest.SerializeToString,
@@ -68,6 +73,12 @@ class AgentManagerServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def Screenshot(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
     def GetAgents(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
@@ -96,6 +107,11 @@ def add_AgentManagerServicer_to_server(servicer, server):
                     servicer.UploadFile,
                     request_deserializer=cmds__pb2.UploadFileRequest.FromString,
                     response_serializer=cmds__pb2.UploadFileResponse.SerializeToString,
+            ),
+            'Screenshot': grpc.unary_unary_rpc_method_handler(
+                    servicer.Screenshot,
+                    request_deserializer=cmds__pb2.ScreenshotRequest.FromString,
+                    response_serializer=cmds__pb2.ScreenshotResponse.SerializeToString,
             ),
             'GetAgents': grpc.unary_stream_rpc_method_handler(
                     servicer.GetAgents,
@@ -177,6 +193,23 @@ class AgentManager(object):
         return grpc.experimental.unary_unary(request, target, '/AgentManager/UploadFile',
             cmds__pb2.UploadFileRequest.SerializeToString,
             cmds__pb2.UploadFileResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def Screenshot(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/AgentManager/Screenshot',
+            cmds__pb2.ScreenshotRequest.SerializeToString,
+            cmds__pb2.ScreenshotResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 

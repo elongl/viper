@@ -7,23 +7,29 @@ class CommandError(ControllerError):
 
 
 class ShellCommandError(CommandError):
-    def __init__(self, cmd: str, err_msg: str, data: bytes):
+    def __init__(self, cmd: str, err: str, data: bytes):
         self.cmd = cmd
-        self.err_msg = err_msg
+        self.err = err
         self.data = data
         super().__init__(
-            f'Failed to execute shell command "{cmd}": {err_msg} ; {data}')
+            f'Failed to execute shell command "{cmd}": {err} : {data}')
+
+
+class ScreenshotError(CommandError):
+    def __init__(self, err: str):
+        self.err = err
+        super().__init__(f'Failed to take screenshot: {err}')
 
 
 class DownloadFileError(CommandError):
-    def __init__(self, remote_path: str, err_msg: str):
+    def __init__(self, remote_path: str, err: str):
         self.remote_path = remote_path
-        self.err_msg = err_msg
-        super().__init__(f'Failed to download file "{remote_path}": {err_msg}')
+        self.err = err
+        super().__init__(f'Failed to download file "{remote_path}": {err}')
 
 
 class UploadFileError(CommandError):
-    def __init__(self, remote_path: str, err_msg: str):
+    def __init__(self, remote_path: str, err: str):
         self.remote_path = remote_path
-        self.err_msg = err_msg
-        super().__init__(f'Failed to upload file "{remote_path}": {err_msg}')
+        self.err = err
+        super().__init__(f'Failed to upload file "{remote_path}": {err}')

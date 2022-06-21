@@ -17,6 +17,6 @@ func (s *AgentManagerServer) RunShellCommand(ctx context.Context, req *pb.ShellC
 	if err != nil {
 		return nil, err
 	}
-	log.Printf("Received echo response.")
+	log.Printf("Received shell response.")
 	return resp, nil
 }

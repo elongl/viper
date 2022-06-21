@@ -1,4 +1,6 @@
 from dataclasses import dataclass
+from datetime import datetime
+from pathlib import Path
 from typing import Union
 
 import grpc
@@ -6,6 +8,8 @@ import grpc
 import cmds_pb2
 import cmds_pb2_grpc
 import errors
+
+_PRODUCTS_DIR_PATH = Path(__file__).parent / "products"
 
 
 @dataclass
@@ -25,20 +29,31 @@ class Agent:
             raise errors.ShellCommandError(cmd, resp.err, resp.data)
         return resp.data.decode() if decode else resp.data
 
+    def screenshot(self, local_path_to_save: str = None) -> None:
+        req = cmds_pb2.ScreenshotRequest(agent_id=self.id)
+        resp = self._stub.Screenshot(req)
+        if resp.err:
+            raise errors.ScreenshotError(resp.err)
+        output_path = local_path_to_save or Path(
+            _PRODUCTS_DIR_PATH, f'screenshot_agent_{self.id}_{datetime.now().isoformat()}.png')
+        with open(output_path, 'wb') as screenshot_file:
+            screenshot_file.write(resp.data)
+        print(f'[*] Saved screenshot to {output_path}')
+
     def download_file(self, remote_path: str, local_path: str = None) -> Union[bytes, None]:
         req = cmds_pb2.DownloadFileRequest(agent_id=self.id, path=remote_path)
         resp = self._stub.DownloadFile(req)
         if resp.err:
             raise errors.DownloadFileError(remote_path, resp.err)
         if local_path:
-            with open(local_path, 'wb') as f:
-                f.write(resp.data)
+            with open(local_path, 'wb') as downloaded_file:
+                downloaded_file.write(resp.data)
         else:
             return resp.data
 
     def upload_file(self, local_path: str, remote_path: str) -> None:
-        with open(local_path, 'rb') as f:
-            data = f.read()
+        with open(local_path, 'rb') as uploaded_file:
+            data = uploaded_file.read()
         req = cmds_pb2.UploadFileRequest(
             agent_id=self.id, path=remote_path, data=data)
         resp = self._stub.UploadFile(req)
@@ -54,8 +69,14 @@ class ControllerClient:
     addr: str
     _stub: cmds_pb2_grpc.AgentManagerStub = None
 
+    MAX_MSG_LEN = 100 * 1024 * 1024
+    CHANNEL_OPTS = [
+        ('grpc.max_send_message_length', MAX_MSG_LEN),
+        ('grpc.max_receive_message_length', MAX_MSG_LEN),
+    ]
+
     def connect(self) -> None:
-        channel = grpc.insecure_channel(self.addr)
+        channel = grpc.insecure_channel(self.addr, options=self.CHANNEL_OPTS)
         self._stub = cmds_pb2_grpc.AgentManagerStub(channel)
 
     def get_agent(self, agent_id: int) -> Agent:
