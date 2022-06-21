@@ -22,7 +22,7 @@ class Agent:
         req = cmds_pb2.ShellCommandRequest(agent_id=self.id, cmd=cmd)
         resp = self._stub.RunShellCommand(req)
         if resp.err:
-            raise errors.ShellCommandError(cmd, resp.err)
+            raise errors.ShellCommandError(cmd, resp.err, resp.data)
         return resp.data.decode() if decode else resp.data
 
     def download_file(self, remote_path: str, local_path: str = None) -> Union[bytes, None]:
