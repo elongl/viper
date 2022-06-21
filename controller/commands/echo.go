@@ -8,7 +8,7 @@ import (
 )
 
 func (s *AgentManagerServer) RunEchoCommand(ctx context.Context, req *pb.EchoCommandRequest) (*pb.EchoCommandResponse, error) {
-	log.Printf("Sending echo command to agent (%d)", req.AgentId)
+	log.Printf("[%d] Sending echo command.", req.AgentId)
 	agent, err := agents.GetAgent(req.AgentId)
 	if err != nil {
 		return nil, err

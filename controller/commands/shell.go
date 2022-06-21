@@ -8,7 +8,7 @@ import (
 )
 
 func (s *AgentManagerServer) RunShellCommand(ctx context.Context, req *pb.ShellCommandRequest) (*pb.ShellCommandResponse, error) {
-	log.Printf("Sending shell command to agent (%d)", req.AgentId)
+	log.Printf("[%d] Sending shell command.", req.AgentId)
 	agent, err := agents.GetAgent(req.AgentId)
 	if err != nil {
 		return nil, err

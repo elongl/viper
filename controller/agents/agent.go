@@ -51,7 +51,7 @@ func InitAgent(conn net.Conn) {
 		conn.Close()
 		return
 	}
-	log.Printf("Initializing agent (%d)", agentId)
+	log.Printf("[%d] Initializing agent.", agentId)
 	Agents[agentId] = agent
 }
 
@@ -172,10 +172,10 @@ func (agent *Agent) write(cmdReq *pb.CommandRequest) error {
 
 func (agent *Agent) Close() {
 	if !agent.alive {
-		log.Printf("Agent (%d) already closed.", agent.Id)
+		log.Printf("[%d] Agent already closed.", agent.Id)
 		return
 	}
-	log.Printf("Agent (%d) has disconnected.", agent.Id)
+	log.Printf("[%d] Agent has disconnected.", agent.Id)
 	agent.conn.Close()
 	agent.alive = false
 }

@@ -7,7 +7,7 @@ import (
 )
 
 func UploadFileToController(req *pb.DownloadFileRequest) *pb.DownloadFileResponse {
-	log.Printf("Uploading file to controller from '%s' on agent (%d).", req.Path, req.AgentId)
+	log.Printf("[%d] Uploading file to controller from '%s'.", req.AgentId, req.Path)
 	data, err := os.ReadFile(req.Path)
 	if err != nil {
 		log.Printf("Failed to download file: %v", err)
@@ -17,7 +17,7 @@ func UploadFileToController(req *pb.DownloadFileRequest) *pb.DownloadFileRespons
 }
 
 func DownloadFileFromController(req *pb.UploadFileRequest) *pb.UploadFileResponse {
-	log.Printf("Downloading file from controller to '%s' on agent (%d).", req.Path, req.AgentId)
+	log.Printf("[%d] Downloading file from controller to '%s'.", req.AgentId, req.Path)
 	err := os.WriteFile(req.Path, req.Data, 0644)
 	if err != nil {
 		log.Printf("Failed to upload file: %v", err)
