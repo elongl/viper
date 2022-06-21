@@ -44,22 +44,16 @@ func (cnc *Controller) ReadCommandRequest() (*pb.CommandRequest, error) {
 	for {
 		var cmdSize int64
 		err := binary.Read(cnc.conn, binary.LittleEndian, &cmdSize)
-		if err == io.EOF {
+		if err != nil {
 			cnc.Connect()
 			continue
-		}
-		if err != nil {
-			return nil, err
 		}
 
 		cmdBuffer := make([]byte, cmdSize)
-		_, err = cnc.conn.Read(cmdBuffer)
-		if err == io.EOF {
+		_, err = io.ReadFull(cnc.conn, cmdBuffer)
+		if err != nil {
 			cnc.Connect()
 			continue
-		}
-		if err != nil {
-			return nil, err
 		}
 		cmd := &pb.CommandRequest{}
 		err = proto.Unmarshal(cmdBuffer, cmd)
@@ -78,20 +72,14 @@ func (cnc *Controller) WriteCommandResponse(resp proto.Message) error {
 		}
 		respBufferLen := int64(len(respBuffer))
 		err = binary.Write(cnc.conn, binary.LittleEndian, &respBufferLen)
-		if err == io.EOF {
+		if err != nil {
 			cnc.Connect()
 			continue
-		}
-		if err != nil {
-			return err
 		}
 		_, err = cnc.conn.Write(respBuffer)
-		if err == io.EOF {
+		if err != nil {
 			cnc.Connect()
 			continue
-		}
-		if err != nil {
-			return err
 		}
 		return nil
 	}

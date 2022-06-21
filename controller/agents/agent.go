@@ -122,7 +122,7 @@ func (agent *Agent) UploadFile(req *pb.UploadFileRequest) (*pb.UploadFileRespons
 func (agent *Agent) read(resp proto.Message) error {
 	var respSize int64
 	err := binary.Read(agent.conn, binary.LittleEndian, &respSize)
-	if err == io.EOF {
+	if err == io.EOF || err == io.ErrUnexpectedEOF {
 		agent.Close()
 		return fmt.Errorf(ERR_AGENT_DISCONNECTED, agent.Id)
 	}
@@ -130,8 +130,8 @@ func (agent *Agent) read(resp proto.Message) error {
 		return err
 	}
 	respBuffer := make([]byte, respSize)
-	_, err = agent.conn.Read(respBuffer)
-	if err == io.EOF {
+	_, err = io.ReadFull(agent.conn, respBuffer)
+	if err == io.EOF || err == io.ErrUnexpectedEOF {
 		agent.Close()
 		return fmt.Errorf(ERR_AGENT_DISCONNECTED, agent.Id)
 	}
@@ -152,7 +152,7 @@ func (agent *Agent) write(cmdReq *pb.CommandRequest) error {
 	}
 	cmdBufferLen := int64(len(cmdBuffer))
 	err = binary.Write(agent.conn, binary.LittleEndian, &cmdBufferLen)
-	if err == io.EOF {
+	if err == io.EOF || err == io.ErrUnexpectedEOF {
 		agent.Close()
 		return fmt.Errorf(ERR_AGENT_DISCONNECTED, agent.Id)
 	}
@@ -160,7 +160,7 @@ func (agent *Agent) write(cmdReq *pb.CommandRequest) error {
 		return err
 	}
 	_, err = agent.conn.Write(cmdBuffer)
-	if err == io.EOF {
+	if err == io.EOF || err == io.ErrUnexpectedEOF {
 		agent.Close()
 		return fmt.Errorf(ERR_AGENT_DISCONNECTED, agent.Id)
 	}
