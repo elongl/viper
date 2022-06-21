@@ -51,7 +51,7 @@ func InitAgent(conn net.Conn) {
 		conn.Close()
 		return
 	}
-	log.Printf("Initializing agent (%d) @ %v", agentId, conn.RemoteAddr())
+	log.Printf("Initializing agent (%d)", agentId)
 	Agents[agentId] = agent
 }
 

@@ -61,8 +61,8 @@ class ControllerClient:
     def get_agent(self, agent_id: int) -> Agent:
         return Agent(agent_id, self._stub)
 
-    def get_agents(self) -> [cmds_pb2.AgentInfo]:
-        return self._stub.GetAgents(cmds_pb2.Empty())
+    def get_agents(self, alive_only=False) -> [cmds_pb2.AgentInfo]:
+        return self._stub.GetAgents(cmds_pb2.GetAgentsRequest(alive_only=alive_only))
 
 
 if __name__ == '__main__':
