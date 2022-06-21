@@ -18,9 +18,6 @@ func (s *AgentManagerServer) DownloadFile(ctx context.Context, req *pb.DownloadF
 	if err != nil {
 		return nil, err
 	}
-	if resp.Err != "" {
-		return nil, fmt.Errorf("Failed to download file: %v", resp.Err)
-	}
 	log.Print("Downloaded file.")
 	return resp, nil
 }
@@ -34,9 +31,6 @@ func (s *AgentManagerServer) UploadFile(ctx context.Context, req *pb.UploadFileR
 	resp, err := agent.UploadFile(req)
 	if err != nil {
 		return nil, err
-	}
-	if resp.Err != "" {
-		return nil, fmt.Errorf("Failed to upload file: %v", resp.Err)
 	}
 	log.Print("Uploaded file.")
 	return resp, nil

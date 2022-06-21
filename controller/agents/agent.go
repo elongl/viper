@@ -74,6 +74,9 @@ func (agent *Agent) Screenshot(req *pb.ScreenshotRequest) (*pb.ScreenshotRespons
 	if err != nil {
 		return nil, err
 	}
+	if resp.Err != "" {
+		return nil, fmt.Errorf("Failed to take screenshot: %v", resp.Err)
+	}
 	return resp, nil
 }
 
@@ -102,6 +105,9 @@ func (agent *Agent) RunShellCommand(req *pb.ShellCommandRequest) (*pb.ShellComma
 	if err != nil {
 		return nil, err
 	}
+	if resp.Err != "" {
+		return nil, fmt.Errorf("Failed to run shell command: %v : %s", resp.Err, resp.Data)
+	}
 	return resp, nil
 }
 
@@ -116,6 +122,9 @@ func (agent *Agent) DownloadFile(req *pb.DownloadFileRequest) (*pb.DownloadFileR
 	if err != nil {
 		return nil, err
 	}
+	if resp.Err != "" {
+		return nil, fmt.Errorf("Failed to download file: %v", resp.Err)
+	}
 	return resp, nil
 }
 
@@ -129,6 +138,9 @@ func (agent *Agent) UploadFile(req *pb.UploadFileRequest) (*pb.UploadFileRespons
 	err = agent.read(resp)
 	if err != nil {
 		return nil, err
+	}
+	if resp.Err != "" {
+		return nil, fmt.Errorf("Failed to upload file: %v", resp.Err)
 	}
 	return resp, nil
 }

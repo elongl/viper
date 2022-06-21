@@ -18,9 +18,6 @@ func (s *AgentManagerServer) Screenshot(ctx context.Context, req *pb.ScreenshotR
 	if err != nil {
 		return nil, err
 	}
-	if resp.Err != "" {
-		return nil, fmt.Errorf("Failed to take screenshot: %v", resp.Err)
-	}
 	log.Printf("Received screenshot response.")
 	return resp, nil
 }
