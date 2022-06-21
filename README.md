@@ -9,6 +9,13 @@ Remote control software using gRPC and Go.
 - Agent Manager - The server that runs alongside the _controller_ to manage the _agents_.
 - Controller Client - Talks to the _agent manager_.
 
+## Features
+
+- Authentication & Encryption - Using TLS, agent connections are encrypted and verified using client certificates.
+- Shell - Execute shell commands.
+- File I/O - Download and upload files.
+- Screenshots - Take a screenshots.
+
 ## Usage
 
 1. Update the `config.json` according to your needs.
