@@ -14,6 +14,10 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
+const (
+	ERR_CONTROLLER_CONN_CLOSED = "Connection to controller has been closed."
+)
+
 type Controller struct {
 	Addr string
 	conn net.Conn
@@ -45,7 +49,7 @@ func (cnc *Controller) ReadCommandRequest() (*pb.CommandRequest, error) {
 		var cmdSize int64
 		err := binary.Read(cnc.conn, binary.LittleEndian, &cmdSize)
 		if err == io.EOF {
-			cnc.Connect()
+			log.Fatal(ERR_CONTROLLER_CONN_CLOSED)
 			continue
 		}
 		if err != nil {
@@ -55,7 +59,7 @@ func (cnc *Controller) ReadCommandRequest() (*pb.CommandRequest, error) {
 		cmdBuffer := make([]byte, cmdSize)
 		_, err = cnc.conn.Read(cmdBuffer)
 		if err == io.EOF {
-			cnc.Connect()
+			log.Fatal(ERR_CONTROLLER_CONN_CLOSED)
 			continue
 		}
 		if err != nil {
@@ -79,7 +83,7 @@ func (cnc *Controller) WriteCommandResponse(resp proto.Message) error {
 		respBufferLen := int64(len(respBuffer))
 		err = binary.Write(cnc.conn, binary.LittleEndian, &respBufferLen)
 		if err == io.EOF {
-			cnc.Connect()
+			log.Fatal("Controller has closed the connection.")
 			continue
 		}
 		if err != nil {
@@ -87,7 +91,7 @@ func (cnc *Controller) WriteCommandResponse(resp proto.Message) error {
 		}
 		_, err = cnc.conn.Write(respBuffer)
 		if err == io.EOF {
-			cnc.Connect()
+			log.Fatal(ERR_CONTROLLER_CONN_CLOSED)
 			continue
 		}
 		if err != nil {
