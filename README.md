@@ -11,6 +11,7 @@ Remote control software using gRPC and Go.
 
 ## Features
 
+- Cross-platform Support - Viper currently runs on all modern operating systems (Windows, Linux, macOS, etc).
 - Authentication & Encryption - Using TLS, agent connections are encrypted and verified using client certificates.
 - Shell - Execute shell commands.
 - File I/O - Download and upload files.
