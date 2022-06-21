@@ -35,7 +35,7 @@ func GetAgent(id int64) (*Agent, error) {
 	if agent == nil {
 		return nil, errors.New(ERR_AGENT_NOT_FOUND)
 	}
-	if !agent.IsAlive() {
+	if !agent.alive {
 		return nil, fmt.Errorf(ERR_AGENT_DISCONNECTED, id)
 	}
 	return agent, nil
