@@ -16,15 +16,14 @@ import (
 )
 
 type SocksServer struct {
-	session   *yamux.Session
-	agentConn net.Conn
 	proxyAddr net.Addr
 }
 
 type Agent struct {
 	Id          int64
 	alive       bool
-	conn        net.Conn
+	session     *yamux.Session
+	cmdStream   net.Conn
 	ConnectTime time.Time
 	socks       *SocksServer
 }
@@ -51,8 +50,17 @@ func GetAgent(id int64) (*Agent, error) {
 
 func InitAgent(conn net.Conn) {
 	log.Printf("Received connection @ %v", conn.RemoteAddr())
+	session, err := yamux.Server(conn, nil)
+	if err != nil {
+		log.Printf("Failed to create a multiplexed server: %v", err)
+		return
+	}
+	cmdStream, err := session.Accept()
+	if err != nil {
+		log.Printf("Failed to accept a multiplex stream: %v", err)
+	}
 	agentId := int64(len(Agents))
-	agent := &Agent{conn: conn, alive: true, Id: agentId, ConnectTime: time.Now()}
+	agent := &Agent{session: session, cmdStream: cmdStream, alive: true, Id: agentId, ConnectTime: time.Now()}
 	validAgent := agent.IsAlive()
 	if !validAgent {
 		log.Print("Connection is not an agent.")
@@ -170,30 +178,23 @@ func (agent *Agent) StartSocksServer(req *pb.StartSocksServerRequest) (*pb.Start
 	if resp.Err != "" {
 		return nil, errors.New(resp.Err)
 	}
-	socksSession, err := yamux.Client(agent.conn, nil)
-	if err != nil {
-		return nil, err
-	}
 	log.Printf("[%d] Connected to the SOCKS server.", agent.Id)
 	controllerSocksListener, err := net.Listen("tcp", "127.0.0.1:")
 	if err != nil {
-		socksSession.Close()
 		return nil, err
 	}
 	resp.Addr = controllerSocksListener.Addr().String()
 	log.Printf("[%d] SOCKS proxy server @ %s", agent.Id, resp.Addr)
-	agent.socks = &SocksServer{session: socksSession, proxyAddr: controllerSocksListener.Addr()}
+	agent.socks = &SocksServer{proxyAddr: controllerSocksListener.Addr()}
 	go func() {
 		for {
-			agentConn, err := socksSession.Open()
+			agentConn, err := agent.session.Open()
 			if err != nil {
 				log.Printf("Failed to open a SOCKS session.")
-				socksSession.Close()
 			}
 			controllerConn, err := controllerSocksListener.Accept()
 			if err != nil {
 				log.Printf("[%d] Failed to accept new SOCKS proxy connection.", agent.Id)
-				socksSession.Close()
 			}
 			go proxyConns(controllerConn, agentConn)
 			go proxyConns(agentConn, controllerConn)
@@ -214,7 +215,7 @@ func proxyConns(conn1, conn2 net.Conn) {
 
 func (agent *Agent) read(resp proto.Message) error {
 	var respSize int64
-	err := binary.Read(agent.conn, binary.LittleEndian, &respSize)
+	err := binary.Read(agent.cmdStream, binary.LittleEndian, &respSize)
 	if err == io.EOF || err == io.ErrUnexpectedEOF {
 		agent.Close()
 		return fmt.Errorf(ERR_AGENT_DISCONNECTED, agent.Id)
@@ -223,7 +224,7 @@ func (agent *Agent) read(resp proto.Message) error {
 		return err
 	}
 	respBuffer := make([]byte, respSize)
-	_, err = io.ReadFull(agent.conn, respBuffer)
+	_, err = io.ReadFull(agent.cmdStream, respBuffer)
 	if err == io.EOF || err == io.ErrUnexpectedEOF {
 		agent.Close()
 		return fmt.Errorf(ERR_AGENT_DISCONNECTED, agent.Id)
@@ -244,7 +245,7 @@ func (agent *Agent) write(cmdReq *pb.CommandRequest) error {
 		return err
 	}
 	cmdBufferLen := int64(len(cmdBuffer))
-	err = binary.Write(agent.conn, binary.LittleEndian, &cmdBufferLen)
+	err = binary.Write(agent.cmdStream, binary.LittleEndian, &cmdBufferLen)
 	if err == io.EOF || err == io.ErrUnexpectedEOF {
 		agent.Close()
 		return fmt.Errorf(ERR_AGENT_DISCONNECTED, agent.Id)
@@ -252,7 +253,7 @@ func (agent *Agent) write(cmdReq *pb.CommandRequest) error {
 	if err != nil {
 		return err
 	}
-	_, err = agent.conn.Write(cmdBuffer)
+	_, err = agent.cmdStream.Write(cmdBuffer)
 	if err == io.EOF || err == io.ErrUnexpectedEOF {
 		agent.Close()
 		return fmt.Errorf(ERR_AGENT_DISCONNECTED, agent.Id)
@@ -269,6 +270,6 @@ func (agent *Agent) Close() {
 		return
 	}
 	log.Printf("[%d] Agent has disconnected.", agent.Id)
-	agent.conn.Close()
+	agent.cmdStream.Close()
 	agent.alive = false
 }

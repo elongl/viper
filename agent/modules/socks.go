@@ -2,27 +2,22 @@ package modules
 
 import (
 	"log"
-	"net"
 	pb "viper/protos/cmds"
 
 	socks "github.com/armon/go-socks5"
 	"github.com/hashicorp/yamux"
 )
 
-func StartSocksServer(req *pb.StartSocksServerRequest, controllerConn net.Conn) *pb.StartSocksServerResponse {
+func StartSocksServer(req *pb.StartSocksServerRequest, controllerSession *yamux.Session) *pb.StartSocksServerResponse {
 	log.Printf("Starting SOCKS server.")
-	session, err := yamux.Server(controllerConn, nil)
-	if err != nil {
-		return &pb.StartSocksServerResponse{Err: err.Error()}
-	}
 	go func() {
 		for {
-			stream, err := session.Accept()
+			stream, err := controllerSession.Accept()
 			if err != nil {
-				log.Printf("Failed to accept connection: %v", err)
+				log.Printf("Failed to accept SOCKS connection: %v", err)
 				return
 			}
-			log.Print("Received controller's connection.")
+			log.Print("Received controller's SOCKS connection.")
 			server, err := socks.New(&socks.Config{})
 			if err != nil {
 				log.Printf("Failed to create a SOCKS server: %v", err)

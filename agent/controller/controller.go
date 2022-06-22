@@ -11,12 +11,14 @@ import (
 	"viper"
 	pb "viper/protos/cmds"
 
+	"github.com/hashicorp/yamux"
 	"google.golang.org/protobuf/proto"
 )
 
 type Controller struct {
-	Addr string
-	Conn net.Conn
+	Addr      string
+	Session   *yamux.Session
+	cmdStream net.Conn
 }
 
 func (cnc *Controller) Connect() {
@@ -32,25 +34,35 @@ func (cnc *Controller) Connect() {
 		if err != nil {
 			log.Printf("Failed to connect to controller: %v", err)
 			time.Sleep(time.Minute * 1)
-		} else {
-			log.Print("Connected to controller.")
-			cnc.Conn = conn
-			return
+			continue
 		}
+		log.Print("Connected to controller.")
+		session, err := yamux.Client(conn, nil)
+		if err != nil {
+			log.Printf("Failed to create multiplexing client: %v", err)
+			continue
+		}
+		cnc.Session = session
+		stream, err := session.Open()
+		if err != nil {
+			log.Printf("Failed to open a multiplexed stream:", err)
+			continue
+		}
+		cnc.cmdStream = stream
+		return
 	}
 }
 
 func (cnc *Controller) ReadCommandRequest() (*pb.CommandRequest, error) {
 	for {
 		var cmdSize int64
-		err := binary.Read(cnc.Conn, binary.LittleEndian, &cmdSize)
+		err := binary.Read(cnc.cmdStream, binary.LittleEndian, &cmdSize)
 		if err != nil {
 			cnc.Connect()
 			continue
 		}
-
 		cmdBuffer := make([]byte, cmdSize)
-		_, err = io.ReadFull(cnc.Conn, cmdBuffer)
+		_, err = io.ReadFull(cnc.cmdStream, cmdBuffer)
 		if err != nil {
 			cnc.Connect()
 			continue
@@ -71,12 +83,12 @@ func (cnc *Controller) WriteCommandResponse(resp proto.Message) error {
 			return err
 		}
 		respBufferLen := int64(len(respBuffer))
-		err = binary.Write(cnc.Conn, binary.LittleEndian, &respBufferLen)
+		err = binary.Write(cnc.cmdStream, binary.LittleEndian, &respBufferLen)
 		if err != nil {
 			cnc.Connect()
 			continue
 		}
-		_, err = cnc.Conn.Write(respBuffer)
+		_, err = cnc.cmdStream.Write(respBuffer)
 		if err != nil {
 			cnc.Connect()
 			continue
