@@ -3,14 +3,14 @@ module viper
 go 1.18
 
 require (
+	github.com/armon/go-socks5 v0.0.0-20160902184237-e75332964ef5
+	github.com/hashicorp/yamux v0.0.0-20211028200310-0bc27b27de87
 	google.golang.org/grpc v1.47.0
 	google.golang.org/protobuf v1.28.0
 )
 
 require (
-	github.com/armon/go-socks5 v0.0.0-20160902184237-e75332964ef5 // indirect
 	github.com/gen2brain/shm v0.0.0-20200228170931-49f9650110c5 // indirect
-	github.com/hashicorp/yamux v0.0.0-20211028200310-0bc27b27de87 // indirect
 	github.com/jezek/xgb v0.0.0-20210312150743-0e0f116e1240 // indirect
 	github.com/lxn/win v0.0.0-20210218163916-a377121e959e // indirect
 )
