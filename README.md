@@ -16,7 +16,7 @@ Remote control software using gRPC and Go.
 - Persistence - The agent keeps connection to the controller even if rebooted or disconnected momentarily.
 - Shell - Execute shell commands.
 - File I/O - Download and upload files.
-- Screenshots - Take a screenshots.
+- Screenshots - Capture screenshots.
 - SOCKS - Connect into the agents' network.
 
 ## Usage
