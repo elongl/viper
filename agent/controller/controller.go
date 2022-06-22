@@ -16,7 +16,7 @@ import (
 
 type Controller struct {
 	Addr string
-	conn net.Conn
+	Conn net.Conn
 }
 
 func (cnc *Controller) Connect() {
@@ -34,7 +34,7 @@ func (cnc *Controller) Connect() {
 			time.Sleep(time.Minute * 1)
 		} else {
 			log.Print("Connected to controller.")
-			cnc.conn = conn
+			cnc.Conn = conn
 			return
 		}
 	}
@@ -43,14 +43,14 @@ func (cnc *Controller) Connect() {
 func (cnc *Controller) ReadCommandRequest() (*pb.CommandRequest, error) {
 	for {
 		var cmdSize int64
-		err := binary.Read(cnc.conn, binary.LittleEndian, &cmdSize)
+		err := binary.Read(cnc.Conn, binary.LittleEndian, &cmdSize)
 		if err != nil {
 			cnc.Connect()
 			continue
 		}
 
 		cmdBuffer := make([]byte, cmdSize)
-		_, err = io.ReadFull(cnc.conn, cmdBuffer)
+		_, err = io.ReadFull(cnc.Conn, cmdBuffer)
 		if err != nil {
 			cnc.Connect()
 			continue
@@ -71,12 +71,12 @@ func (cnc *Controller) WriteCommandResponse(resp proto.Message) error {
 			return err
 		}
 		respBufferLen := int64(len(respBuffer))
-		err = binary.Write(cnc.conn, binary.LittleEndian, &respBufferLen)
+		err = binary.Write(cnc.Conn, binary.LittleEndian, &respBufferLen)
 		if err != nil {
 			cnc.Connect()
 			continue
 		}
-		_, err = cnc.conn.Write(respBuffer)
+		_, err = cnc.Conn.Write(respBuffer)
 		if err != nil {
 			cnc.Connect()
 			continue

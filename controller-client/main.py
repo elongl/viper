@@ -49,7 +49,12 @@ class Agent:
             data = uploaded_file.read()
         req = cmds_pb2.UploadFileRequest(
             agent_id=self.id, path=remote_path, data=data)
-        resp = self._stub.UploadFile(req)
+        self._stub.UploadFile(req)
+
+    def start_socks_server(self) -> str:
+        req = cmds_pb2.StartSocksServerRequest(agent_id=self.id)
+        resp = self._stub.StartSocksServer(req)
+        return resp.addr
 
     def __repr__(self) -> str:
         return f'Agent(id={self.id})'

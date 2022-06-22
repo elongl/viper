@@ -9,6 +9,7 @@ service AgentManager {
   rpc UploadFile(UploadFileRequest) returns (UploadFileResponse) {}
   rpc Screenshot(ScreenshotRequest) returns (ScreenshotResponse) {}
   rpc GetAgents(GetAgentsRequest) returns (stream AgentInfo) {}
+  rpc StartSocksServer(StartSocksServerRequest) returns (StartSocksServerResponse) {}
 }
 
 message CommandRequest {
@@ -19,6 +20,7 @@ message CommandRequest {
     DownloadFileRequest download_file_request = 4;
     UploadFileRequest upload_file_request = 5;
     ScreenshotRequest screenshot_request = 6;
+    StartSocksServerRequest start_socks_server_request = 7;
   }
 }
 
@@ -72,6 +74,15 @@ message ScreenshotResponse {
 
 message GetAgentsRequest {
   bool alive_only = 1;
+}
+
+message StartSocksServerRequest {
+  int64 agent_id = 1;
+}
+
+message StartSocksServerResponse {
+  string err = 1;
+  string addr = 2;
 }
 
 message AgentInfo {

@@ -2,7 +2,6 @@ package commands
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"viper/controller/agents"
 	pb "viper/protos/cmds"
