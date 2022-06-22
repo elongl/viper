@@ -25,27 +25,27 @@ func (cnc *Controller) Connect() {
 	certBuffers := viper.Conf.Agent.Cert
 	cert, err := tls.X509KeyPair([]byte(certBuffers.Cert), []byte(certBuffers.Key))
 	if err != nil {
-		log.Fatalf("Failed to load certificate: %v", err)
+		log.Fatalf("failed to load certificate: %v", err)
 	}
 	tlsCfg := &tls.Config{Certificates: []tls.Certificate{cert}, InsecureSkipVerify: true}
 	for {
-		log.Printf("Connecting to controller.")
+		log.Printf("connecting to controller")
 		conn, err := tls.Dial("tcp", cnc.Addr, tlsCfg)
 		if err != nil {
-			log.Printf("Failed to connect to controller: %v", err)
+			log.Printf("failed to connect to controller: %v", err)
 			time.Sleep(time.Minute * 1)
 			continue
 		}
-		log.Printf("Connected to controller.")
+		log.Printf("connected to controller")
 		session, err := yamux.Client(conn, nil)
 		if err != nil {
-			log.Printf("Failed to create multiplexing client: %v", err)
+			log.Printf("failed to create multiplexing client: %v", err)
 			continue
 		}
 		cnc.Session = session
 		cmdStream, err := session.Open()
 		if err != nil {
-			log.Printf("Failed to open a multiplexed stream: %v", err)
+			log.Printf("failed to open a multiplexed stream: %v", err)
 			continue
 		}
 		cnc.cmdStream = cmdStream

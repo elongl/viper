@@ -6,6 +6,6 @@ import (
 )
 
 func RunEchoCommand(req *pb.EchoCommandRequest) *pb.EchoCommandResponse {
-	log.Printf("Running echo command: '%s'.", req.Data)
+	log.Printf("running echo command: '%s'", req.Data)
 	return &pb.EchoCommandResponse{Data: req.Data}
 }

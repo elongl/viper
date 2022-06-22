@@ -13,14 +13,14 @@ import (
 func main() {
 	err := modules.EnsurePersistence()
 	if err != nil {
-		log.Fatalf("Failed to persist: %v", err)
+		log.Fatalf("failed to persist: %v", err)
 	}
 	controller := controller.Controller{Addr: viper.Conf.Agent.ControllerAddress}
 	controller.Connect()
 	for {
 		cmdReq, err := controller.ReadCommandRequest()
 		if err != nil {
-			log.Printf("Failed to read command: %v", err)
+			log.Printf("failed to read command: %v", err)
 			continue
 		}
 		var resp proto.Message
@@ -42,7 +42,7 @@ func main() {
 		}
 		err = controller.WriteCommandResponse(resp)
 		if err != nil {
-			log.Printf("Failed to write command response: %v", err)
+			log.Printf("failed to write command response: %v", err)
 		}
 	}
 }

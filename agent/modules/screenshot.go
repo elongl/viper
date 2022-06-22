@@ -16,7 +16,7 @@ import (
 var zeroPoint = image.Point{0, 0}
 
 func Screenshot(req *pb.ScreenshotRequest) *pb.ScreenshotResponse {
-	log.Printf("Taking a screenshot.")
+	log.Printf("taking a screenshot")
 	displays, err := captureDisplays()
 	if err != nil {
 		return &pb.ScreenshotResponse{Err: err.Error()}
@@ -33,11 +33,11 @@ func encodeDisplay(display *image.RGBA) (*[]byte, error) {
 	displayBuffer := &bytes.Buffer{}
 	err := png.Encode(displayBuffer, display)
 	if err != nil {
-		return nil, fmt.Errorf("Error encoding screenshot: %v", err)
+		return nil, fmt.Errorf("error encoding screenshot: %v", err)
 	}
 	displayBytes, err := io.ReadAll(displayBuffer)
 	if err != nil {
-		return nil, fmt.Errorf("Error reading screenshot: %v", err)
+		return nil, fmt.Errorf("error reading screenshot: %v", err)
 	}
 	return &displayBytes, nil
 }
@@ -48,7 +48,7 @@ func captureDisplays() ([]*image.RGBA, error) {
 	for idx := 0; idx < screenCount; idx++ {
 		display, err := screenshot.CaptureDisplay(idx)
 		if err != nil {
-			return nil, fmt.Errorf("Error taking screenshot: %v", err)
+			return nil, fmt.Errorf("error taking screenshot: %v", err)
 		}
 		displays = append(displays, display)
 	}

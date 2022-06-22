@@ -7,7 +7,7 @@ import (
 )
 
 func (s *AgentManagerServer) GetAgents(req *pb.GetAgentsRequest, stream pb.AgentManager_GetAgentsServer) error {
-	log.Printf("Getting the agents.")
+	log.Printf("getting the agents")
 	for _, agent := range agents.Agents {
 		agentAlive := agent.IsAlive()
 		if req.AliveOnly && !agentAlive {
@@ -18,6 +18,6 @@ func (s *AgentManagerServer) GetAgents(req *pb.GetAgentsRequest, stream pb.Agent
 			return err
 		}
 	}
-	log.Printf("Sent the agents.")
+	log.Printf("sent the agents")
 	return nil
 }

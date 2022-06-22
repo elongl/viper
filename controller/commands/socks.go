@@ -8,7 +8,7 @@ import (
 )
 
 func (s *AgentManagerServer) StartSocksServer(ctx context.Context, req *pb.StartSocksServerRequest) (*pb.StartSocksServerResponse, error) {
-	log.Printf("[%d] Starting SOCKS server.", req.AgentId)
+	log.Printf("[%d] starting SOCKS server", req.AgentId)
 	agent, err := agents.GetAgent(req.AgentId)
 	if err != nil {
 		return nil, err
@@ -17,12 +17,12 @@ func (s *AgentManagerServer) StartSocksServer(ctx context.Context, req *pb.Start
 	if err != nil {
 		return nil, err
 	}
-	log.Printf("Started SOCKS server.")
+	log.Printf("started SOCKS server")
 	return resp, nil
 }
 
 func (s *AgentManagerServer) StopSocksServer(ctx context.Context, req *pb.StopSocksServerRequest) (*pb.StopSocksServerResponse, error) {
-	log.Printf("[%d] Stopping SOCKS server.", req.AgentId)
+	log.Printf("[%d] stopping SOCKS server", req.AgentId)
 	agent, err := agents.GetAgent(req.AgentId)
 	if err != nil {
 		return nil, err
@@ -31,6 +31,6 @@ func (s *AgentManagerServer) StopSocksServer(ctx context.Context, req *pb.StopSo
 	if err != nil {
 		return nil, err
 	}
-	log.Printf("Stopped SOCKS server.")
+	log.Printf("stopped SOCKS server")
 	return resp, nil
 }

@@ -7,20 +7,20 @@ import (
 )
 
 func UploadFileToController(req *pb.DownloadFileRequest) *pb.DownloadFileResponse {
-	log.Printf("Uploading file to controller from '%s'.", req.Path)
+	log.Printf("uploading file to controller from '%s'", req.Path)
 	data, err := os.ReadFile(req.Path)
 	if err != nil {
-		log.Printf("Failed to download file: %v", err)
+		log.Printf("failed to download file: %v", err)
 		return &pb.DownloadFileResponse{Err: err.Error()}
 	}
 	return &pb.DownloadFileResponse{Data: data}
 }
 
 func DownloadFileFromController(req *pb.UploadFileRequest) *pb.UploadFileResponse {
-	log.Printf("Downloading file from controller to '%s'.", req.Path)
+	log.Printf("downloading file from controller to '%s'", req.Path)
 	err := os.WriteFile(req.Path, req.Data, 0644)
 	if err != nil {
-		log.Printf("Failed to upload file: %v", err)
+		log.Printf("failed to upload file: %v", err)
 		return &pb.UploadFileResponse{Err: err.Error()}
 	}
 	return &pb.UploadFileResponse{}

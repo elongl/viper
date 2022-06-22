@@ -2,7 +2,6 @@ package agents
 
 import (
 	"encoding/binary"
-	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -25,8 +24,8 @@ type Agent struct {
 }
 
 const (
-	ERR_AGENT_DISCONNECTED = "Agent (%d) has disconnected."
-	ERR_AGENT_NOT_FOUND    = "Agent not found."
+	ERR_AGENT_DISCONNECTED = "[%d] agent has disconnected"
+	ERR_AGENT_NOT_FOUND    = "agent not found"
 )
 
 var (
@@ -36,7 +35,7 @@ var (
 func GetAgent(id int64) (*Agent, error) {
 	agent := Agents[id]
 	if agent == nil {
-		return nil, errors.New(ERR_AGENT_NOT_FOUND)
+		return nil, fmt.Errorf(ERR_AGENT_NOT_FOUND)
 	}
 	if !agent.alive {
 		return nil, fmt.Errorf(ERR_AGENT_DISCONNECTED, id)
@@ -45,25 +44,25 @@ func GetAgent(id int64) (*Agent, error) {
 }
 
 func InitAgent(conn net.Conn) {
-	log.Printf("Received connection @ %v", conn.RemoteAddr())
+	log.Printf("received connection @ %v", conn.RemoteAddr())
 	session, err := yamux.Server(conn, nil)
 	if err != nil {
-		log.Printf("Failed to create a multiplexed server: %v", err)
+		log.Printf("failed to create a multiplexed server: %v", err)
 		return
 	}
 	cmdStream, err := session.Accept()
 	if err != nil {
-		log.Printf("Failed to accept a multiplex stream: %v", err)
+		log.Printf("failed to accept a multiplex stream: %v", err)
 	}
 	agentId := int64(len(Agents))
 	agent := &Agent{session: session, cmdStream: cmdStream, alive: true, Id: agentId, ConnectTime: time.Now()}
 	validAgent := agent.IsAlive()
 	if !validAgent {
-		log.Printf("Connection is not an agent.")
+		log.Printf("connection is not an agent")
 		conn.Close()
 		return
 	}
-	log.Printf("[%d] Initializing agent.", agentId)
+	log.Printf("[%d] initializing agent", agentId)
 	Agents[agentId] = agent
 }
 
@@ -87,7 +86,7 @@ func (agent *Agent) Screenshot(req *pb.ScreenshotRequest) (*pb.ScreenshotRespons
 		return nil, err
 	}
 	if resp.Err != "" {
-		return nil, errors.New(resp.Err)
+		return nil, fmt.Errorf(resp.Err)
 	}
 	return resp, nil
 }
@@ -118,7 +117,7 @@ func (agent *Agent) RunShellCommand(req *pb.ShellCommandRequest) (*pb.ShellComma
 		return nil, err
 	}
 	if resp.Err != "" {
-		return nil, errors.New(resp.Err)
+		return nil, fmt.Errorf(resp.Err)
 	}
 	return resp, nil
 }
@@ -135,7 +134,7 @@ func (agent *Agent) DownloadFile(req *pb.DownloadFileRequest) (*pb.DownloadFileR
 		return nil, err
 	}
 	if resp.Err != "" {
-		return nil, errors.New(resp.Err)
+		return nil, fmt.Errorf(resp.Err)
 	}
 	return resp, nil
 }
@@ -152,14 +151,14 @@ func (agent *Agent) UploadFile(req *pb.UploadFileRequest) (*pb.UploadFileRespons
 		return nil, err
 	}
 	if resp.Err != "" {
-		return nil, errors.New(resp.Err)
+		return nil, fmt.Errorf(resp.Err)
 	}
 	return resp, nil
 }
 
 func (agent *Agent) StartSocksServer(req *pb.StartSocksServerRequest) (*pb.StartSocksServerResponse, error) {
 	if agent.socksProxyListener != nil {
-		return nil, fmt.Errorf("SOCKS server already running at %v.", agent.socksProxyListener.Addr())
+		return nil, fmt.Errorf("the SOCKS server is already running at %v", agent.socksProxyListener.Addr())
 	}
 	cmdReq := &pb.CommandRequest{Type: pb.START_SOCKS_CMD_TYPE, Req: &pb.CommandRequest_StartSocksServerRequest{StartSocksServerRequest: req}}
 	err := agent.write(cmdReq)
@@ -172,9 +171,9 @@ func (agent *Agent) StartSocksServer(req *pb.StartSocksServerRequest) (*pb.Start
 		return nil, err
 	}
 	if resp.Err != "" {
-		return nil, errors.New(resp.Err)
+		return nil, fmt.Errorf(resp.Err)
 	}
-	log.Printf("[%d] Connected to the SOCKS server.", agent.Id)
+	log.Printf("[%d] connected to the SOCKS server", agent.Id)
 	socksProxyListener, err := net.Listen("tcp", "127.0.0.1:")
 	if err != nil {
 		return nil, err
@@ -186,12 +185,12 @@ func (agent *Agent) StartSocksServer(req *pb.StartSocksServerRequest) (*pb.Start
 		for {
 			agentConn, err := agent.session.Open()
 			if err != nil {
-				log.Printf("Failed to open a SOCKS session.")
+				log.Printf("failed to open a SOCKS session")
 				return
 			}
 			controllerConn, err := socksProxyListener.Accept()
 			if err != nil {
-				log.Printf("[%d] Stopped accepting new SOCKS proxy connection.", agent.Id)
+				log.Printf("[%d] stopped accepting new SOCKS proxy connection", agent.Id)
 				return
 			}
 			go proxyConns(controllerConn, agentConn)
@@ -203,7 +202,7 @@ func (agent *Agent) StartSocksServer(req *pb.StartSocksServerRequest) (*pb.Start
 
 func (agent *Agent) StopSocksServer(req *pb.StopSocksServerRequest) (*pb.StopSocksServerResponse, error) {
 	if agent.socksProxyListener == nil {
-		return nil, fmt.Errorf("SOCKS server is not running.")
+		return nil, fmt.Errorf("the SOCKS server is not running")
 	}
 	cmdReq := &pb.CommandRequest{Type: pb.STOP_SOCKS_CMD_TYPE, Req: &pb.CommandRequest_StopSocksServerRequest{StopSocksServerRequest: req}}
 	err := agent.write(cmdReq)
@@ -217,7 +216,7 @@ func (agent *Agent) StopSocksServer(req *pb.StopSocksServerRequest) (*pb.StopSoc
 	}
 	err = agent.socksProxyListener.Close()
 	if err != nil {
-		return nil, fmt.Errorf("Failed to close the SOCKS proxy server: %v", err)
+		return nil, fmt.Errorf("failed to close the SOCKS proxy server: %v", err)
 	}
 	agent.socksProxyListener = nil
 	return resp, nil
@@ -226,7 +225,7 @@ func (agent *Agent) StopSocksServer(req *pb.StopSocksServerRequest) (*pb.StopSoc
 func proxyConns(conn1, conn2 net.Conn) {
 	_, err := io.Copy(conn1, conn2)
 	if err != nil {
-		log.Printf("Failed to proxy connections: %v", err)
+		log.Printf("failed to proxy connections: %v", err)
 		return
 	}
 	conn1.Close()
@@ -286,10 +285,10 @@ func (agent *Agent) write(cmdReq *pb.CommandRequest) error {
 
 func (agent *Agent) Close() {
 	if !agent.alive {
-		log.Printf("[%d] Agent already closed.", agent.Id)
+		log.Printf("[%d] agent already closed", agent.Id)
 		return
 	}
-	log.Printf("[%d] Agent has disconnected.", agent.Id)
+	log.Printf("[%d] agent has disconnected", agent.Id)
 	agent.cmdStream.Close()
 	agent.alive = false
 }

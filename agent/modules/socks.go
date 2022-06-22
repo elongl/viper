@@ -16,7 +16,7 @@ var (
 )
 
 func StartSocksServer(req *pb.StartSocksServerRequest, controllerSession *yamux.Session) *pb.StartSocksServerResponse {
-	log.Printf("Starting SOCKS server.")
+	log.Printf("starting SOCKS server")
 	if !startedAccepting {
 		go acceptConnsToChans(controllerSession)
 		startedAccepting = true
@@ -26,7 +26,7 @@ func StartSocksServer(req *pb.StartSocksServerRequest, controllerSession *yamux.
 }
 
 func StopSocksServer(req *pb.StopSocksServerRequest, controllerSession *yamux.Session) *pb.StopSocksServerResponse {
-	log.Printf("Stopping SOCKS server.")
+	log.Printf("stopping SOCKS server")
 	stopCh <- true
 	return &pb.StopSocksServerResponse{}
 }
@@ -38,7 +38,7 @@ func acceptConnsToChans(controllerSession *yamux.Session) {
 			log.Printf("Failed to accept SOCKS connection: %v", err)
 			return
 		}
-		log.Printf("Received controller's SOCKS connection.")
+		log.Printf("feceived controller's SOCKS connection")
 		streamCh <- stream
 	}
 }
@@ -47,12 +47,12 @@ func serveConns() {
 	for {
 		select {
 		case <-stopCh:
-			log.Print("Stopping the SOCKS server.")
+			log.Print("stopping the SOCKS server")
 			return
 		case stream := <-streamCh:
 			server, err := socks.New(&socks.Config{})
 			if err != nil {
-				log.Printf("Failed to create a SOCKS server: %v", err)
+				log.Printf("failed to create a SOCKS server: %v", err)
 				return
 			}
 			go server.ServeConn(stream)
