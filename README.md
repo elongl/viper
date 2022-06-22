@@ -17,7 +17,7 @@ Remote control software using gRPC and Go.
 - Shell - Execute shell commands.
 - File I/O - Download and upload files.
 - Screenshots - Capture screenshots.
-- SOCKS - Connect into the agents' network.
+- SOCKS - Connect into the agent's network.
 
 ## Usage
 
