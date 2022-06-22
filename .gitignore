@@ -5,4 +5,5 @@ bin
 .DS_Store
 
 config.json
+controller-client/products
 

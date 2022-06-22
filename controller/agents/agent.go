@@ -55,6 +55,7 @@ func InitAgent(conn net.Conn) {
 	cmdStream, err := session.Accept()
 	if err != nil {
 		log.Printf("failed to accept a multiplex stream: %v", err)
+		return
 	}
 	agentId := int64(len(Agents))
 	agent := &Agent{session: session, cmdStream: cmdStream, alive: true, Id: agentId, ConnectTime: time.Now()}

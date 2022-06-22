@@ -35,10 +35,10 @@ func acceptConnsToChans(controllerSession *yamux.Session) {
 	for {
 		stream, err := controllerSession.Accept()
 		if err != nil {
-			log.Printf("Failed to accept SOCKS connection: %v", err)
+			log.Printf("failed to accept SOCKS connection: %v", err)
 			return
 		}
-		log.Printf("feceived controller's SOCKS connection")
+		log.Printf("received controller's SOCKS connection")
 		streamCh <- stream
 	}
 }
