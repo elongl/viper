@@ -17,6 +17,10 @@ import (
 	"google.golang.org/grpc"
 )
 
+const (
+	MAX_MSG_LEN = 100 * 1024 * 1024
+)
+
 func runAgentServer() {
 	certBuffers := viper.Conf.Controller.Cert
 	cert, err := tls.X509KeyPair([]byte(certBuffers.Cert), []byte(certBuffers.Key))
@@ -48,13 +52,12 @@ func runAgentManagerServer() {
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
-	server := grpc.NewServer()
+	server := grpc.NewServer(grpc.MaxRecvMsgSize(MAX_MSG_LEN), grpc.MaxSendMsgSize(MAX_MSG_LEN))
 	pb.RegisterAgentManagerServer(server, &commands.AgentManagerServer{})
 	log.Printf("agent manager server listening at %v", lis.Addr())
 	if err := server.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)
 	}
-
 }
 
 func main() {
