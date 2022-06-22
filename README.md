@@ -13,9 +13,11 @@ Remote control software using gRPC and Go.
 
 - Cross-platform Support - Viper currently runs on all modern operating systems (Windows, Linux, macOS, etc).
 - Authentication & Encryption - Using TLS, agent connections are encrypted and verified using client certificates.
+- Persistence - The agent keeps connection to the controller even if rebooted or disconnected momentarily.
 - Shell - Execute shell commands.
 - File I/O - Download and upload files.
 - Screenshots - Take a screenshots.
+- SOCKS - Connect into the agents' network.
 
 ## Usage
 
