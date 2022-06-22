@@ -47,7 +47,9 @@ func GetAgent(id int64) (*Agent, error) {
 
 func InitAgent(conn net.Conn) {
 	log.Printf("received connection @ %v", conn.RemoteAddr())
-	session, err := yamux.Server(conn, nil)
+	yamuxConf := yamux.DefaultConfig()
+	yamuxConf.StreamOpenTimeout = 0
+	session, err := yamux.Server(conn, yamuxConf)
 	if err != nil {
 		log.Printf("failed to create a multiplexed server: %v", err)
 		return
