@@ -56,6 +56,10 @@ class Agent:
         resp = self._stub.StartSocksServer(req)
         return resp.addr
 
+    def stop_socks_server(self) -> str:
+        req = cmds_pb2.StopSocksServerRequest(agent_id=self.id)
+        resp = self._stub.StopSocksServer(req)
+
     def __repr__(self) -> str:
         return f'Agent(id={self.id})'
 

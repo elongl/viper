@@ -16,7 +16,7 @@ import (
 var zeroPoint = image.Point{0, 0}
 
 func Screenshot(req *pb.ScreenshotRequest) *pb.ScreenshotResponse {
-	log.Print("Taking a screenshot.")
+	log.Printf("Taking a screenshot.")
 	displays, err := captureDisplays()
 	if err != nil {
 		return &pb.ScreenshotResponse{Err: err.Error()}

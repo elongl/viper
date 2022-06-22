@@ -15,17 +15,13 @@ import (
 	pb "viper/protos/cmds"
 )
 
-type SocksServer struct {
-	proxyAddr net.Addr
-}
-
 type Agent struct {
-	Id          int64
-	alive       bool
-	session     *yamux.Session
-	cmdStream   net.Conn
-	ConnectTime time.Time
-	socks       *SocksServer
+	Id                 int64
+	alive              bool
+	session            *yamux.Session
+	cmdStream          net.Conn
+	ConnectTime        time.Time
+	socksProxyListener net.Listener
 }
 
 const (
@@ -63,7 +59,7 @@ func InitAgent(conn net.Conn) {
 	agent := &Agent{session: session, cmdStream: cmdStream, alive: true, Id: agentId, ConnectTime: time.Now()}
 	validAgent := agent.IsAlive()
 	if !validAgent {
-		log.Print("Connection is not an agent.")
+		log.Printf("Connection is not an agent.")
 		conn.Close()
 		return
 	}
@@ -162,8 +158,8 @@ func (agent *Agent) UploadFile(req *pb.UploadFileRequest) (*pb.UploadFileRespons
 }
 
 func (agent *Agent) StartSocksServer(req *pb.StartSocksServerRequest) (*pb.StartSocksServerResponse, error) {
-	if agent.socks != nil {
-		return nil, fmt.Errorf("[%d] SOCKS server already running at %v.", agent.Id, agent.socks.proxyAddr)
+	if agent.socksProxyListener != nil {
+		return nil, fmt.Errorf("SOCKS server already running at %v.", agent.socksProxyListener.Addr())
 	}
 	cmdReq := &pb.CommandRequest{Type: pb.START_SOCKS_CMD_TYPE, Req: &pb.CommandRequest_StartSocksServerRequest{StartSocksServerRequest: req}}
 	err := agent.write(cmdReq)
@@ -179,27 +175,51 @@ func (agent *Agent) StartSocksServer(req *pb.StartSocksServerRequest) (*pb.Start
 		return nil, errors.New(resp.Err)
 	}
 	log.Printf("[%d] Connected to the SOCKS server.", agent.Id)
-	controllerSocksListener, err := net.Listen("tcp", "127.0.0.1:")
+	socksProxyListener, err := net.Listen("tcp", "127.0.0.1:")
 	if err != nil {
 		return nil, err
 	}
-	resp.Addr = controllerSocksListener.Addr().String()
+	agent.socksProxyListener = socksProxyListener
+	resp.Addr = socksProxyListener.Addr().String()
 	log.Printf("[%d] SOCKS proxy server @ %s", agent.Id, resp.Addr)
-	agent.socks = &SocksServer{proxyAddr: controllerSocksListener.Addr()}
 	go func() {
 		for {
 			agentConn, err := agent.session.Open()
 			if err != nil {
 				log.Printf("Failed to open a SOCKS session.")
+				return
 			}
-			controllerConn, err := controllerSocksListener.Accept()
+			controllerConn, err := socksProxyListener.Accept()
 			if err != nil {
-				log.Printf("[%d] Failed to accept new SOCKS proxy connection.", agent.Id)
+				log.Printf("[%d] Stopped accepting new SOCKS proxy connection.", agent.Id)
+				return
 			}
 			go proxyConns(controllerConn, agentConn)
 			go proxyConns(agentConn, controllerConn)
 		}
 	}()
+	return resp, nil
+}
+
+func (agent *Agent) StopSocksServer(req *pb.StopSocksServerRequest) (*pb.StopSocksServerResponse, error) {
+	if agent.socksProxyListener == nil {
+		return nil, fmt.Errorf("SOCKS server is not running.")
+	}
+	cmdReq := &pb.CommandRequest{Type: pb.STOP_SOCKS_CMD_TYPE, Req: &pb.CommandRequest_StopSocksServerRequest{StopSocksServerRequest: req}}
+	err := agent.write(cmdReq)
+	if err != nil {
+		return nil, err
+	}
+	resp := &pb.StopSocksServerResponse{}
+	err = agent.read(resp)
+	if err != nil {
+		return nil, err
+	}
+	err = agent.socksProxyListener.Close()
+	if err != nil {
+		return nil, fmt.Errorf("Failed to close the SOCKS proxy server: %v", err)
+	}
+	agent.socksProxyListener = nil
 	return resp, nil
 }
 

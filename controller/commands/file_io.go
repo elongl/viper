@@ -17,7 +17,7 @@ func (s *AgentManagerServer) DownloadFile(ctx context.Context, req *pb.DownloadF
 	if err != nil {
 		return nil, err
 	}
-	log.Print("Downloaded file.")
+	log.Printf("Downloaded file.")
 	return resp, nil
 }
 
@@ -31,6 +31,6 @@ func (s *AgentManagerServer) UploadFile(ctx context.Context, req *pb.UploadFileR
 	if err != nil {
 		return nil, err
 	}
-	log.Print("Uploaded file.")
+	log.Printf("Uploaded file.")
 	return resp, nil
 }

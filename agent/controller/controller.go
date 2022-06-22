@@ -29,26 +29,26 @@ func (cnc *Controller) Connect() {
 	}
 	tlsCfg := &tls.Config{Certificates: []tls.Certificate{cert}, InsecureSkipVerify: true}
 	for {
-		log.Print("Connecting to controller.")
+		log.Printf("Connecting to controller.")
 		conn, err := tls.Dial("tcp", cnc.Addr, tlsCfg)
 		if err != nil {
 			log.Printf("Failed to connect to controller: %v", err)
 			time.Sleep(time.Minute * 1)
 			continue
 		}
-		log.Print("Connected to controller.")
+		log.Printf("Connected to controller.")
 		session, err := yamux.Client(conn, nil)
 		if err != nil {
 			log.Printf("Failed to create multiplexing client: %v", err)
 			continue
 		}
 		cnc.Session = session
-		stream, err := session.Open()
+		cmdStream, err := session.Open()
 		if err != nil {
 			log.Printf("Failed to open a multiplexed stream:", err)
 			continue
 		}
-		cnc.cmdStream = stream
+		cnc.cmdStream = cmdStream
 		return
 	}
 }

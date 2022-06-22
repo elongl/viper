@@ -49,6 +49,11 @@ class AgentManagerStub(object):
                 request_serializer=cmds__pb2.StartSocksServerRequest.SerializeToString,
                 response_deserializer=cmds__pb2.StartSocksServerResponse.FromString,
                 )
+        self.StopSocksServer = channel.unary_unary(
+                '/AgentManager/StopSocksServer',
+                request_serializer=cmds__pb2.StopSocksServerRequest.SerializeToString,
+                response_deserializer=cmds__pb2.StopSocksServerResponse.FromString,
+                )
 
 
 class AgentManagerServicer(object):
@@ -96,6 +101,12 @@ class AgentManagerServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def StopSocksServer(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_AgentManagerServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -133,6 +144,11 @@ def add_AgentManagerServicer_to_server(servicer, server):
                     servicer.StartSocksServer,
                     request_deserializer=cmds__pb2.StartSocksServerRequest.FromString,
                     response_serializer=cmds__pb2.StartSocksServerResponse.SerializeToString,
+            ),
+            'StopSocksServer': grpc.unary_unary_rpc_method_handler(
+                    servicer.StopSocksServer,
+                    request_deserializer=cmds__pb2.StopSocksServerRequest.FromString,
+                    response_serializer=cmds__pb2.StopSocksServerResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -260,5 +276,22 @@ class AgentManager(object):
         return grpc.experimental.unary_unary(request, target, '/AgentManager/StartSocksServer',
             cmds__pb2.StartSocksServerRequest.SerializeToString,
             cmds__pb2.StartSocksServerResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def StopSocksServer(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/AgentManager/StopSocksServer',
+            cmds__pb2.StopSocksServerRequest.SerializeToString,
+            cmds__pb2.StopSocksServerResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

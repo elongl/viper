@@ -29,6 +29,7 @@ type AgentManagerClient interface {
 	Screenshot(ctx context.Context, in *ScreenshotRequest, opts ...grpc.CallOption) (*ScreenshotResponse, error)
 	GetAgents(ctx context.Context, in *GetAgentsRequest, opts ...grpc.CallOption) (AgentManager_GetAgentsClient, error)
 	StartSocksServer(ctx context.Context, in *StartSocksServerRequest, opts ...grpc.CallOption) (*StartSocksServerResponse, error)
+	StopSocksServer(ctx context.Context, in *StopSocksServerRequest, opts ...grpc.CallOption) (*StopSocksServerResponse, error)
 }
 
 type agentManagerClient struct {
@@ -125,6 +126,15 @@ func (c *agentManagerClient) StartSocksServer(ctx context.Context, in *StartSock
 	return out, nil
 }
 
+func (c *agentManagerClient) StopSocksServer(ctx context.Context, in *StopSocksServerRequest, opts ...grpc.CallOption) (*StopSocksServerResponse, error) {
+	out := new(StopSocksServerResponse)
+	err := c.cc.Invoke(ctx, "/AgentManager/StopSocksServer", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AgentManagerServer is the server API for AgentManager service.
 // All implementations must embed UnimplementedAgentManagerServer
 // for forward compatibility
@@ -136,6 +146,7 @@ type AgentManagerServer interface {
 	Screenshot(context.Context, *ScreenshotRequest) (*ScreenshotResponse, error)
 	GetAgents(*GetAgentsRequest, AgentManager_GetAgentsServer) error
 	StartSocksServer(context.Context, *StartSocksServerRequest) (*StartSocksServerResponse, error)
+	StopSocksServer(context.Context, *StopSocksServerRequest) (*StopSocksServerResponse, error)
 	mustEmbedUnimplementedAgentManagerServer()
 }
 
@@ -163,6 +174,9 @@ func (UnimplementedAgentManagerServer) GetAgents(*GetAgentsRequest, AgentManager
 }
 func (UnimplementedAgentManagerServer) StartSocksServer(context.Context, *StartSocksServerRequest) (*StartSocksServerResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method StartSocksServer not implemented")
+}
+func (UnimplementedAgentManagerServer) StopSocksServer(context.Context, *StopSocksServerRequest) (*StopSocksServerResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method StopSocksServer not implemented")
 }
 func (UnimplementedAgentManagerServer) mustEmbedUnimplementedAgentManagerServer() {}
 
@@ -306,6 +320,24 @@ func _AgentManager_StartSocksServer_Handler(srv interface{}, ctx context.Context
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AgentManager_StopSocksServer_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(StopSocksServerRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AgentManagerServer).StopSocksServer(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/AgentManager/StopSocksServer",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AgentManagerServer).StopSocksServer(ctx, req.(*StopSocksServerRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // AgentManager_ServiceDesc is the grpc.ServiceDesc for AgentManager service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -336,6 +368,10 @@ var AgentManager_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "StartSocksServer",
 			Handler:    _AgentManager_StartSocksServer_Handler,
+		},
+		{
+			MethodName: "StopSocksServer",
+			Handler:    _AgentManager_StopSocksServer_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{

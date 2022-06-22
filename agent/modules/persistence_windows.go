@@ -32,7 +32,7 @@ func moveAgentExecutable(currentAgentPath string) error {
 }
 
 func Persist(currentAgentPath string) error {
-	log.Print("Persisting.")
+	log.Printf("Persisting.")
 	moveAgentExecutable(currentAgentPath)
 	cmd := exec.Command("schtasks", "/create", "/tn", conf.TaskName, "/tr", conf.Path, "/sc", "minute", "/f")
 	cmd.SysProcAttr = &syscall.SysProcAttr{HideWindow: true}
@@ -40,19 +40,19 @@ func Persist(currentAgentPath string) error {
 	if err != nil {
 		return fmt.Errorf("Failed to run persistence command: %s ; %v", out, err)
 	}
-	log.Print("Persisted. Exiting, agent will restart shortly.")
+	log.Printf("Persisted. Exiting, agent will restart shortly.")
 	os.Exit(0)
 	return nil
 }
 
 func EnsurePersistence() error {
-	log.Print("Ensuring persistence.")
+	log.Printf("Ensuring persistence.")
 	currentAgentPath, err := os.Executable()
 	if err != nil {
 		return err
 	}
 	if currentAgentPath == conf.Path {
-		log.Print("Agent is already persistent.")
+		log.Printf("Agent is already persistent.")
 		return nil
 	}
 	return Persist(currentAgentPath)
