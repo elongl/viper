@@ -10,14 +10,17 @@ import (
 )
 
 var (
-	streamCh = make(chan net.Conn)
-	stopCh   = make(chan bool)
+	streamCh         = make(chan net.Conn)
+	stopCh           = make(chan bool)
+	startedAccepting = false
 )
 
 func StartSocksServer(req *pb.StartSocksServerRequest, controllerSession *yamux.Session) *pb.StartSocksServerResponse {
 	log.Printf("Starting SOCKS server.")
-	// TODO: This goroutine is currently leaking (never exits). Fix.
-	go acceptConnsToChans(controllerSession)
+	if !startedAccepting {
+		go acceptConnsToChans(controllerSession)
+		startedAccepting = true
+	}
 	go serveConns()
 	return &pb.StartSocksServerResponse{}
 }
