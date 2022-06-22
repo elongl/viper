@@ -3,6 +3,7 @@
 package modules
 
 import (
+	"fmt"
 	"log"
 	"os/exec"
 	pb "viper/protos/cmds"
@@ -13,8 +14,9 @@ func RunShellCommand(req *pb.ShellCommandRequest) *pb.ShellCommandResponse {
 	cmd := exec.Command("sh", "-c", req.Cmd)
 	out, err := cmd.CombinedOutput()
 	if err != nil {
-		log.Printf("failed to run shell command: %v", err)
-		return &pb.ShellCommandResponse{Data: out, Err: err.Error()}
+		msg := fmt.Sprintf("%v : %s", err, out)
+		log.Printf("failed to run shell command: %s", msg)
+		return &pb.ShellCommandResponse{Data: out, Err: msg}
 	}
 	return &pb.ShellCommandResponse{Data: out}
 }
