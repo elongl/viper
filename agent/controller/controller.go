@@ -45,7 +45,7 @@ func (cnc *Controller) Connect() {
 		cnc.Session = session
 		cmdStream, err := session.Open()
 		if err != nil {
-			log.Printf("Failed to open a multiplexed stream:", err)
+			log.Printf("Failed to open a multiplexed stream: %v", err)
 			continue
 		}
 		cnc.cmdStream = cmdStream

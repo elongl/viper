@@ -44,7 +44,7 @@ func getConfig() *Config {
 	cfg := &Config{}
 	err := json.Unmarshal(configBuffer, cfg)
 	if err != nil {
-		log.Fatal("Failed to parse config: ", err)
+		log.Fatalf("Failed to parse config: %v", err)
 	}
 	return cfg
 }
