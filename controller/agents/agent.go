@@ -78,6 +78,7 @@ func (agent *Agent) IsAlive() bool {
 
 func (agent *Agent) Screenshot(req *pb.ScreenshotRequest) (*pb.ScreenshotResponse, error) {
 	agent.lock.Lock()
+	defer agent.lock.Unlock()
 	cmdReq := &pb.CommandRequest{Type: pb.SCREENSHOT_CMD_TYPE, Req: &pb.CommandRequest_ScreenshotRequest{ScreenshotRequest: req}}
 	err := agent.write(cmdReq)
 	if err != nil {
@@ -91,12 +92,12 @@ func (agent *Agent) Screenshot(req *pb.ScreenshotRequest) (*pb.ScreenshotRespons
 	if resp.Err != "" {
 		return nil, fmt.Errorf(resp.Err)
 	}
-	agent.lock.Unlock()
 	return resp, nil
 }
 
 func (agent *Agent) RunEchoCommand(req *pb.EchoCommandRequest) (*pb.EchoCommandResponse, error) {
 	agent.lock.Lock()
+	defer agent.lock.Unlock()
 	cmdReq := &pb.CommandRequest{Type: pb.ECHO_CMD_TYPE, Req: &pb.CommandRequest_EchoCommandRequest{EchoCommandRequest: req}}
 	err := agent.write(cmdReq)
 	if err != nil {
@@ -107,12 +108,12 @@ func (agent *Agent) RunEchoCommand(req *pb.EchoCommandRequest) (*pb.EchoCommandR
 	if err != nil {
 		return nil, err
 	}
-	agent.lock.Unlock()
 	return resp, nil
 }
 
 func (agent *Agent) RunShellCommand(req *pb.ShellCommandRequest) (*pb.ShellCommandResponse, error) {
 	agent.lock.Lock()
+	defer agent.lock.Unlock()
 	cmdReq := &pb.CommandRequest{Type: pb.SHELL_CMD_TYPE, Req: &pb.CommandRequest_ShellCommandRequest{ShellCommandRequest: req}}
 	err := agent.write(cmdReq)
 	if err != nil {
@@ -126,12 +127,12 @@ func (agent *Agent) RunShellCommand(req *pb.ShellCommandRequest) (*pb.ShellComma
 	if resp.Err != "" {
 		return nil, fmt.Errorf(resp.Err)
 	}
-	agent.lock.Unlock()
 	return resp, nil
 }
 
 func (agent *Agent) DownloadFile(req *pb.DownloadFileRequest) (*pb.DownloadFileResponse, error) {
 	agent.lock.Lock()
+	defer agent.lock.Unlock()
 	cmdReq := &pb.CommandRequest{Type: pb.DOWNLOAD_FILE_CMD_TYPE, Req: &pb.CommandRequest_DownloadFileRequest{DownloadFileRequest: req}}
 	err := agent.write(cmdReq)
 	if err != nil {
@@ -145,12 +146,12 @@ func (agent *Agent) DownloadFile(req *pb.DownloadFileRequest) (*pb.DownloadFileR
 	if resp.Err != "" {
 		return nil, fmt.Errorf(resp.Err)
 	}
-	agent.lock.Unlock()
 	return resp, nil
 }
 
 func (agent *Agent) UploadFile(req *pb.UploadFileRequest) (*pb.UploadFileResponse, error) {
 	agent.lock.Lock()
+	defer agent.lock.Unlock()
 	cmdReq := &pb.CommandRequest{Type: pb.UPLOAD_FILE_CMD_TYPE, Req: &pb.CommandRequest_UploadFileRequest{UploadFileRequest: req}}
 	err := agent.write(cmdReq)
 	if err != nil {
@@ -164,12 +165,12 @@ func (agent *Agent) UploadFile(req *pb.UploadFileRequest) (*pb.UploadFileRespons
 	if resp.Err != "" {
 		return nil, fmt.Errorf(resp.Err)
 	}
-	agent.lock.Unlock()
 	return resp, nil
 }
 
 func (agent *Agent) StartSocksServer(req *pb.StartSocksServerRequest) (*pb.StartSocksServerResponse, error) {
 	agent.lock.Lock()
+	defer agent.lock.Unlock()
 	if agent.socksProxyListener != nil {
 		return nil, fmt.Errorf("the SOCKS server is already running at %v", agent.socksProxyListener.Addr())
 	}
@@ -210,12 +211,12 @@ func (agent *Agent) StartSocksServer(req *pb.StartSocksServerRequest) (*pb.Start
 			go proxyConns(agentConn, controllerConn)
 		}
 	}()
-	agent.lock.Unlock()
 	return resp, nil
 }
 
 func (agent *Agent) StopSocksServer(req *pb.StopSocksServerRequest) (*pb.StopSocksServerResponse, error) {
 	agent.lock.Lock()
+	defer agent.lock.Unlock()
 	if agent.socksProxyListener == nil {
 		return nil, fmt.Errorf("the SOCKS server is not running")
 	}
@@ -234,7 +235,6 @@ func (agent *Agent) StopSocksServer(req *pb.StopSocksServerRequest) (*pb.StopSoc
 		return nil, fmt.Errorf("failed to close the SOCKS proxy server: %v", err)
 	}
 	agent.socksProxyListener = nil
-	agent.lock.Unlock()
 	return resp, nil
 }
 
