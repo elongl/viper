@@ -83,8 +83,7 @@ message StartSocksServerRequest {
 }
 
 message StartSocksServerResponse {
-  string err = 1;
-  string addr = 2;
+  string addr = 1;
 }
 
 message StopSocksServerRequest {

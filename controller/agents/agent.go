@@ -187,9 +187,6 @@ func (agent *Agent) StartSocksServer(req *pb.StartSocksServerRequest) (*pb.Start
 	if err != nil {
 		return nil, err
 	}
-	if resp.Err != "" {
-		return nil, fmt.Errorf(resp.Err)
-	}
 	log.Printf("[%d] connected to the SOCKS server", agent.Id)
 	socksProxyListener, err := net.Listen("tcp", "127.0.0.1:")
 	if err != nil {
