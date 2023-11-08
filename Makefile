@@ -26,10 +26,5 @@ build_proto:
 	protoc --go_out=$(CONTROLLER_PATH)/protos --go-grpc_out=$(CONTROLLER_PATH)/protos $(PROTO_PATH)
 	python -m grpc_tools.protoc -I. --python_out=$(CONTROLLER_CLIENT_PATH) --grpc_python_out=$(CONTROLLER_CLIENT_PATH) $(PROTO_PATH)
 
-install_proto:
-	go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.28
-	go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.2
-	pip install grpcio-tools
-
 clean:
 	rm -rf $(BIN_PATH)
