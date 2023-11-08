@@ -5,7 +5,7 @@ CONTROLLER_PATH = controller
 CONTROLLER_CLIENT_PATH = controller-client
 BIN_PATH = $(MAKEFILE_DIR_PATH)bin
 
-build: build_agent build_agent_debug build_controller build_controller_client
+build: build_agent build_controller build_controller_client
 
 build_agent:
 	GOOS=windows go build -ldflags "-H=windowsgui -s -w" -o $(BIN_PATH)/agent.exe $(AGENT_PATH)/main.go
