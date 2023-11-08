@@ -10,6 +10,10 @@ import (
 	"net"
 	"time"
 
+	"net/http"
+	"strconv"
+	"strings"
+
 	"github.com/hashicorp/yamux"
 	"google.golang.org/protobuf/proto"
 )
@@ -20,6 +24,27 @@ type Controller struct {
 	cmdStream net.Conn
 }
 
+func (cnc *Controller) getAddr() string {
+	addr := config.Conf.ControllerAddress
+	if strings.HasPrefix(addr, "http") {
+		if !strings.Contains(addr, "?_=") {
+			// Add a timestamp to prevent caching.
+			addr += "?_=" + strconv.FormatInt(time.Now().Unix(), 10)
+		}
+		resp, err := http.Get(addr)
+		if err != nil {
+			log.Fatalf("failed to get controller address: %v", err)
+		}
+		defer resp.Body.Close()
+		body, err := io.ReadAll(resp.Body)
+		if err != nil {
+			log.Fatalf("failed to read controller address response body: %v", err)
+		}
+		addr = strings.TrimSpace(string(body))
+	}
+	return addr
+}
+
 func (cnc *Controller) Connect() {
 	keyPairBuffers := config.Conf.KeyPair
 	keyPair, err := tls.X509KeyPair([]byte(keyPairBuffers.Cert), []byte(keyPairBuffers.Key))
@@ -28,8 +53,9 @@ func (cnc *Controller) Connect() {
 	}
 	tlsCfg := &tls.Config{Certificates: []tls.Certificate{keyPair}, InsecureSkipVerify: true}
 	for {
-		log.Printf("connecting to controller")
-		conn, err := tls.Dial("tcp", cnc.Addr, tlsCfg)
+		cncAddr := cnc.getAddr()
+		log.Printf("connecting to controller at %s", cncAddr)
+		conn, err := tls.Dial("tcp", cncAddr, tlsCfg)
 		if err != nil {
 			log.Printf("failed to connect to controller: %v", err)
 			time.Sleep(time.Minute * 1)
