@@ -1,4 +1,4 @@
-package viper
+package config
 
 import (
 	_ "embed"
@@ -6,7 +6,7 @@ import (
 	"log"
 )
 
-type CertificateConfig struct {
+type KeyPair struct {
 	Cert string `json:"cert"`
 	Key  string `json:"key"`
 }
@@ -16,28 +16,16 @@ type PersistenceConfig struct {
 	TaskName string `json:"taskName"`
 }
 
-type AgentConfig struct {
+type Config struct {
 	ControllerAddress string            `json:"controllerAddress"`
 	Persistence       PersistenceConfig `json:"persistence"`
-	Cert              CertificateConfig `json:"cert"`
-}
-
-type ControllerConfig struct {
-	AgentServerPort        int               `json:"agentServerPort"`
-	AgentManagerServerPort int               `json:"agentManagerServerPort"`
-	Cert                   CertificateConfig `json:"cert"`
-}
-
-type Config struct {
-	Agent      AgentConfig      `json:"agent"`
-	Controller ControllerConfig `json:"controller"`
+	KeyPair           KeyPair           `json:"keyPair"`
 }
 
 var (
 	//go:embed config.json
 	configBuffer []byte
-
-	Conf = getConfig()
+	Conf         = getConfig()
 )
 
 func getConfig() *Config {

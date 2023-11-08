@@ -5,8 +5,8 @@ from typing import Union
 
 import grpc
 
-from protos.cmds import cmds_pb2
-from protos.cmds import cmds_pb2_grpc
+from protos import cmds_pb2
+from protos import cmds_pb2_grpc
 
 _PRODUCTS_DIR_PATH = Path(__file__).parent / "products"
 

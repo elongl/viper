@@ -1,15 +1,14 @@
 package controller
 
 import (
+	"agent/config"
+	pb "agent/protos/cmds"
 	"crypto/tls"
-	_ "embed"
 	"encoding/binary"
 	"io"
 	"log"
 	"net"
 	"time"
-	"viper"
-	pb "viper/protos/cmds"
 
 	"github.com/hashicorp/yamux"
 	"google.golang.org/protobuf/proto"
@@ -22,12 +21,12 @@ type Controller struct {
 }
 
 func (cnc *Controller) Connect() {
-	certBuffers := viper.Conf.Agent.Cert
-	cert, err := tls.X509KeyPair([]byte(certBuffers.Cert), []byte(certBuffers.Key))
+	keyPairBuffers := config.Conf.KeyPair
+	keyPair, err := tls.X509KeyPair([]byte(keyPairBuffers.Cert), []byte(keyPairBuffers.Key))
 	if err != nil {
 		log.Fatalf("failed to load certificate: %v", err)
 	}
-	tlsCfg := &tls.Config{Certificates: []tls.Certificate{cert}, InsecureSkipVerify: true}
+	tlsCfg := &tls.Config{Certificates: []tls.Certificate{keyPair}, InsecureSkipVerify: true}
 	for {
 		log.Printf("connecting to controller")
 		conn, err := tls.Dial("tcp", cnc.Addr, tlsCfg)

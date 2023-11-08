@@ -1,9 +1,9 @@
 package modules
 
 import (
+	pb "agent/protos/cmds"
 	"log"
 	"os"
-	pb "viper/protos/cmds"
 )
 
 func UploadFileToController(req *pb.DownloadFileRequest) *pb.DownloadFileResponse {

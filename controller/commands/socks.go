@@ -2,9 +2,9 @@ package commands
 
 import (
 	"context"
+	"controller/agents"
+	pb "controller/protos/cmds"
 	"log"
-	"viper/controller/agents"
-	pb "viper/protos/cmds"
 )
 
 func (s *AgentManagerServer) StartSocksServer(ctx context.Context, req *pb.StartSocksServerRequest) (*pb.StartSocksServerResponse, error) {

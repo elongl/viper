@@ -1,6 +1,7 @@
 package modules
 
 import (
+	pb "agent/protos/cmds"
 	"bytes"
 	"fmt"
 	"image"
@@ -8,7 +9,6 @@ import (
 	"image/png"
 	"io"
 	"log"
-	pb "viper/protos/cmds"
 
 	"github.com/kbinani/screenshot"
 )

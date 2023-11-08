@@ -14,15 +14,14 @@ service AgentManager {
 }
 
 message CommandRequest {
-  int64 type = 1;
   oneof req {
-    EchoCommandRequest echo_command_request = 2;
-    ShellCommandRequest shell_command_request = 3;
-    DownloadFileRequest download_file_request = 4;
-    UploadFileRequest upload_file_request = 5;
-    ScreenshotRequest screenshot_request = 6;
-    StartSocksServerRequest start_socks_server_request = 7;
-    StopSocksServerRequest stop_socks_server_request = 8;
+    EchoCommandRequest echo_command_request = 1;
+    ShellCommandRequest shell_command_request = 2;
+    DownloadFileRequest download_file_request = 3;
+    UploadFileRequest upload_file_request = 4;
+    ScreenshotRequest screenshot_request = 5;
+    StartSocksServerRequest start_socks_server_request = 6;
+    StopSocksServerRequest stop_socks_server_request = 7;
   }
 }
 

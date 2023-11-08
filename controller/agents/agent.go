@@ -12,7 +12,7 @@ import (
 	"github.com/hashicorp/yamux"
 	"google.golang.org/protobuf/proto"
 
-	pb "viper/protos/cmds"
+	pb "controller/protos/cmds"
 )
 
 type Agent struct {
@@ -31,7 +31,8 @@ const (
 )
 
 var (
-	Agents = make(map[int64]*Agent)
+	Agents    = make(map[int64]*Agent)
+	yamuxConf = getYamuxConfig()
 )
 
 func GetAgent(id int64) (*Agent, error) {
@@ -47,8 +48,6 @@ func GetAgent(id int64) (*Agent, error) {
 
 func InitAgent(conn net.Conn) {
 	log.Printf("received connection @ %v", conn.RemoteAddr())
-	yamuxConf := yamux.DefaultConfig()
-	yamuxConf.StreamOpenTimeout = 0
 	session, err := yamux.Server(conn, yamuxConf)
 	if err != nil {
 		log.Printf("failed to create a multiplexed server: %v", err)
@@ -82,7 +81,7 @@ func (agent *Agent) IsAlive() bool {
 func (agent *Agent) Screenshot(req *pb.ScreenshotRequest) (*pb.ScreenshotResponse, error) {
 	agent.lock.Lock()
 	defer agent.lock.Unlock()
-	cmdReq := &pb.CommandRequest{Type: pb.SCREENSHOT_CMD_TYPE, Req: &pb.CommandRequest_ScreenshotRequest{ScreenshotRequest: req}}
+	cmdReq := &pb.CommandRequest{Req: &pb.CommandRequest_ScreenshotRequest{ScreenshotRequest: req}}
 	err := agent.write(cmdReq)
 	if err != nil {
 		return nil, err
@@ -101,7 +100,7 @@ func (agent *Agent) Screenshot(req *pb.ScreenshotRequest) (*pb.ScreenshotRespons
 func (agent *Agent) RunEchoCommand(req *pb.EchoCommandRequest) (*pb.EchoCommandResponse, error) {
 	agent.lock.Lock()
 	defer agent.lock.Unlock()
-	cmdReq := &pb.CommandRequest{Type: pb.ECHO_CMD_TYPE, Req: &pb.CommandRequest_EchoCommandRequest{EchoCommandRequest: req}}
+	cmdReq := &pb.CommandRequest{Req: &pb.CommandRequest_EchoCommandRequest{EchoCommandRequest: req}}
 	err := agent.write(cmdReq)
 	if err != nil {
 		return nil, err
@@ -117,7 +116,7 @@ func (agent *Agent) RunEchoCommand(req *pb.EchoCommandRequest) (*pb.EchoCommandR
 func (agent *Agent) RunShellCommand(req *pb.ShellCommandRequest) (*pb.ShellCommandResponse, error) {
 	agent.lock.Lock()
 	defer agent.lock.Unlock()
-	cmdReq := &pb.CommandRequest{Type: pb.SHELL_CMD_TYPE, Req: &pb.CommandRequest_ShellCommandRequest{ShellCommandRequest: req}}
+	cmdReq := &pb.CommandRequest{Req: &pb.CommandRequest_ShellCommandRequest{ShellCommandRequest: req}}
 	err := agent.write(cmdReq)
 	if err != nil {
 		return nil, err
@@ -136,7 +135,7 @@ func (agent *Agent) RunShellCommand(req *pb.ShellCommandRequest) (*pb.ShellComma
 func (agent *Agent) DownloadFile(req *pb.DownloadFileRequest) (*pb.DownloadFileResponse, error) {
 	agent.lock.Lock()
 	defer agent.lock.Unlock()
-	cmdReq := &pb.CommandRequest{Type: pb.DOWNLOAD_FILE_CMD_TYPE, Req: &pb.CommandRequest_DownloadFileRequest{DownloadFileRequest: req}}
+	cmdReq := &pb.CommandRequest{Req: &pb.CommandRequest_DownloadFileRequest{DownloadFileRequest: req}}
 	err := agent.write(cmdReq)
 	if err != nil {
 		return nil, err
@@ -155,7 +154,7 @@ func (agent *Agent) DownloadFile(req *pb.DownloadFileRequest) (*pb.DownloadFileR
 func (agent *Agent) UploadFile(req *pb.UploadFileRequest) (*pb.UploadFileResponse, error) {
 	agent.lock.Lock()
 	defer agent.lock.Unlock()
-	cmdReq := &pb.CommandRequest{Type: pb.UPLOAD_FILE_CMD_TYPE, Req: &pb.CommandRequest_UploadFileRequest{UploadFileRequest: req}}
+	cmdReq := &pb.CommandRequest{Req: &pb.CommandRequest_UploadFileRequest{UploadFileRequest: req}}
 	err := agent.write(cmdReq)
 	if err != nil {
 		return nil, err
@@ -177,7 +176,7 @@ func (agent *Agent) StartSocksServer(req *pb.StartSocksServerRequest) (*pb.Start
 	if agent.socksProxyListener != nil {
 		return nil, fmt.Errorf("the SOCKS server is already running at %v", agent.socksProxyListener.Addr())
 	}
-	cmdReq := &pb.CommandRequest{Type: pb.START_SOCKS_CMD_TYPE, Req: &pb.CommandRequest_StartSocksServerRequest{StartSocksServerRequest: req}}
+	cmdReq := &pb.CommandRequest{Req: &pb.CommandRequest_StartSocksServerRequest{StartSocksServerRequest: req}}
 	err := agent.write(cmdReq)
 	if err != nil {
 		return nil, err
@@ -220,7 +219,7 @@ func (agent *Agent) StopSocksServer(req *pb.StopSocksServerRequest) (*pb.StopSoc
 	if agent.socksProxyListener == nil {
 		return nil, fmt.Errorf("the SOCKS server is not running")
 	}
-	cmdReq := &pb.CommandRequest{Type: pb.STOP_SOCKS_CMD_TYPE, Req: &pb.CommandRequest_StopSocksServerRequest{StopSocksServerRequest: req}}
+	cmdReq := &pb.CommandRequest{Req: &pb.CommandRequest_StopSocksServerRequest{StopSocksServerRequest: req}}
 	err := agent.write(cmdReq)
 	if err != nil {
 		return nil, err
@@ -307,4 +306,10 @@ func (agent *Agent) Close() {
 	log.Printf("[%d] agent has disconnected", agent.Id)
 	agent.cmdStream.Close()
 	agent.alive = false
+}
+
+func getYamuxConfig() *yamux.Config {
+	yamuxConf := yamux.DefaultConfig()
+	yamuxConf.StreamOpenTimeout = 0
+	return yamuxConf
 }

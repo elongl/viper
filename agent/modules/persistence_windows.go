@@ -1,16 +1,16 @@
 package modules
 
 import (
+	"agent/config"
 	"fmt"
 	"io"
 	"log"
 	"os"
 	"os/exec"
 	"syscall"
-	"viper"
 )
 
-var conf = &viper.Conf.Agent.Persistence
+var conf = &config.Conf.Persistence
 
 func moveAgentExecutable(currentAgentPath string) error {
 	agentFile, err := os.Open(currentAgentPath)

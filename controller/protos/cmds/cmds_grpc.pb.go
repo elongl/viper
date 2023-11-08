@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.2.0
 // - protoc             v4.25.0
-// source: protos/cmds/cmds.proto
+// source: protos/cmds.proto
 
 package cmds
 
@@ -381,5 +381,5 @@ var AgentManager_ServiceDesc = grpc.ServiceDesc{
 			ServerStreams: true,
 		},
 	},
-	Metadata: "protos/cmds/cmds.proto",
+	Metadata: "protos/cmds.proto",
 }

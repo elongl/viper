@@ -7,12 +7,11 @@ import (
 	"fmt"
 	"log"
 	"net"
-	"viper"
 
-	_ "embed"
-	"viper/controller/agents"
-	"viper/controller/commands"
-	pb "viper/protos/cmds"
+	"controller/agents"
+	"controller/commands"
+	"controller/config"
+	pb "controller/protos/cmds"
 
 	"google.golang.org/grpc"
 )
@@ -22,18 +21,18 @@ const (
 )
 
 func runAgentServer() {
-	certBuffers := viper.Conf.Controller.Cert
-	cert, err := tls.X509KeyPair([]byte(certBuffers.Cert), []byte(certBuffers.Key))
+	keyPairBuffers := config.Conf.KeyPair
+	keyPair, err := tls.X509KeyPair([]byte(keyPairBuffers.Cert), []byte(keyPairBuffers.Key))
 	if err != nil {
 		log.Fatalf("failed to load certificate: %v", err)
 	}
 	caCertPool := x509.NewCertPool()
-	ok := caCertPool.AppendCertsFromPEM([]byte(viper.Conf.Agent.Cert.Cert))
+	ok := caCertPool.AppendCertsFromPEM([]byte(config.Conf.AgentCert))
 	if !ok {
 		log.Fatalf("failed to parse agent's client certificate")
 	}
-	tlsCfg := &tls.Config{Certificates: []tls.Certificate{cert}, ClientAuth: tls.RequireAndVerifyClientCert, ClientCAs: caCertPool}
-	lis, err := tls.Listen("tcp", fmt.Sprintf("0.0.0.0:%d", viper.Conf.Controller.AgentServerPort), tlsCfg)
+	tlsCfg := &tls.Config{Certificates: []tls.Certificate{keyPair}, ClientAuth: tls.RequireAndVerifyClientCert, ClientCAs: caCertPool}
+	lis, err := tls.Listen("tcp", fmt.Sprintf("0.0.0.0:%d", config.Conf.AgentServerPort), tlsCfg)
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
@@ -48,7 +47,7 @@ func runAgentServer() {
 }
 
 func runAgentManagerServer() {
-	lis, err := net.Listen("tcp", fmt.Sprintf("127.0.0.1:%d", viper.Conf.Controller.AgentManagerServerPort))
+	lis, err := net.Listen("tcp", fmt.Sprintf("127.0.0.1:%d", config.Conf.AgentManagerServerPort))
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}

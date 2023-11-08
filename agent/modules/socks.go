@@ -1,9 +1,9 @@
 package modules
 
 import (
+	pb "agent/protos/cmds"
 	"log"
 	"net"
-	pb "viper/protos/cmds"
 
 	socks "github.com/armon/go-socks5"
 	"github.com/hashicorp/yamux"
