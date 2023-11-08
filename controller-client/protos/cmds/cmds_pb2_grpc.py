@@ -2,7 +2,7 @@
 """Client and server classes corresponding to protobuf-defined services."""
 import grpc
 
-import cmds_pb2 as cmds__pb2
+from protos.cmds import cmds_pb2 as protos_dot_cmds_dot_cmds__pb2
 
 
 class AgentManagerStub(object):
@@ -16,43 +16,43 @@ class AgentManagerStub(object):
         """
         self.RunEchoCommand = channel.unary_unary(
                 '/AgentManager/RunEchoCommand',
-                request_serializer=cmds__pb2.EchoCommandRequest.SerializeToString,
-                response_deserializer=cmds__pb2.EchoCommandResponse.FromString,
+                request_serializer=protos_dot_cmds_dot_cmds__pb2.EchoCommandRequest.SerializeToString,
+                response_deserializer=protos_dot_cmds_dot_cmds__pb2.EchoCommandResponse.FromString,
                 )
         self.RunShellCommand = channel.unary_unary(
                 '/AgentManager/RunShellCommand',
-                request_serializer=cmds__pb2.ShellCommandRequest.SerializeToString,
-                response_deserializer=cmds__pb2.ShellCommandResponse.FromString,
+                request_serializer=protos_dot_cmds_dot_cmds__pb2.ShellCommandRequest.SerializeToString,
+                response_deserializer=protos_dot_cmds_dot_cmds__pb2.ShellCommandResponse.FromString,
                 )
         self.DownloadFile = channel.unary_unary(
                 '/AgentManager/DownloadFile',
-                request_serializer=cmds__pb2.DownloadFileRequest.SerializeToString,
-                response_deserializer=cmds__pb2.DownloadFileResponse.FromString,
+                request_serializer=protos_dot_cmds_dot_cmds__pb2.DownloadFileRequest.SerializeToString,
+                response_deserializer=protos_dot_cmds_dot_cmds__pb2.DownloadFileResponse.FromString,
                 )
         self.UploadFile = channel.unary_unary(
                 '/AgentManager/UploadFile',
-                request_serializer=cmds__pb2.UploadFileRequest.SerializeToString,
-                response_deserializer=cmds__pb2.UploadFileResponse.FromString,
+                request_serializer=protos_dot_cmds_dot_cmds__pb2.UploadFileRequest.SerializeToString,
+                response_deserializer=protos_dot_cmds_dot_cmds__pb2.UploadFileResponse.FromString,
                 )
         self.Screenshot = channel.unary_unary(
                 '/AgentManager/Screenshot',
-                request_serializer=cmds__pb2.ScreenshotRequest.SerializeToString,
-                response_deserializer=cmds__pb2.ScreenshotResponse.FromString,
+                request_serializer=protos_dot_cmds_dot_cmds__pb2.ScreenshotRequest.SerializeToString,
+                response_deserializer=protos_dot_cmds_dot_cmds__pb2.ScreenshotResponse.FromString,
                 )
         self.GetAgents = channel.unary_stream(
                 '/AgentManager/GetAgents',
-                request_serializer=cmds__pb2.GetAgentsRequest.SerializeToString,
-                response_deserializer=cmds__pb2.AgentInfo.FromString,
+                request_serializer=protos_dot_cmds_dot_cmds__pb2.GetAgentsRequest.SerializeToString,
+                response_deserializer=protos_dot_cmds_dot_cmds__pb2.AgentInfo.FromString,
                 )
         self.StartSocksServer = channel.unary_unary(
                 '/AgentManager/StartSocksServer',
-                request_serializer=cmds__pb2.StartSocksServerRequest.SerializeToString,
-                response_deserializer=cmds__pb2.StartSocksServerResponse.FromString,
+                request_serializer=protos_dot_cmds_dot_cmds__pb2.StartSocksServerRequest.SerializeToString,
+                response_deserializer=protos_dot_cmds_dot_cmds__pb2.StartSocksServerResponse.FromString,
                 )
         self.StopSocksServer = channel.unary_unary(
                 '/AgentManager/StopSocksServer',
-                request_serializer=cmds__pb2.StopSocksServerRequest.SerializeToString,
-                response_deserializer=cmds__pb2.StopSocksServerResponse.FromString,
+                request_serializer=protos_dot_cmds_dot_cmds__pb2.StopSocksServerRequest.SerializeToString,
+                response_deserializer=protos_dot_cmds_dot_cmds__pb2.StopSocksServerResponse.FromString,
                 )
 
 
@@ -112,43 +112,43 @@ def add_AgentManagerServicer_to_server(servicer, server):
     rpc_method_handlers = {
             'RunEchoCommand': grpc.unary_unary_rpc_method_handler(
                     servicer.RunEchoCommand,
-                    request_deserializer=cmds__pb2.EchoCommandRequest.FromString,
-                    response_serializer=cmds__pb2.EchoCommandResponse.SerializeToString,
+                    request_deserializer=protos_dot_cmds_dot_cmds__pb2.EchoCommandRequest.FromString,
+                    response_serializer=protos_dot_cmds_dot_cmds__pb2.EchoCommandResponse.SerializeToString,
             ),
             'RunShellCommand': grpc.unary_unary_rpc_method_handler(
                     servicer.RunShellCommand,
-                    request_deserializer=cmds__pb2.ShellCommandRequest.FromString,
-                    response_serializer=cmds__pb2.ShellCommandResponse.SerializeToString,
+                    request_deserializer=protos_dot_cmds_dot_cmds__pb2.ShellCommandRequest.FromString,
+                    response_serializer=protos_dot_cmds_dot_cmds__pb2.ShellCommandResponse.SerializeToString,
             ),
             'DownloadFile': grpc.unary_unary_rpc_method_handler(
                     servicer.DownloadFile,
-                    request_deserializer=cmds__pb2.DownloadFileRequest.FromString,
-                    response_serializer=cmds__pb2.DownloadFileResponse.SerializeToString,
+                    request_deserializer=protos_dot_cmds_dot_cmds__pb2.DownloadFileRequest.FromString,
+                    response_serializer=protos_dot_cmds_dot_cmds__pb2.DownloadFileResponse.SerializeToString,
             ),
             'UploadFile': grpc.unary_unary_rpc_method_handler(
                     servicer.UploadFile,
-                    request_deserializer=cmds__pb2.UploadFileRequest.FromString,
-                    response_serializer=cmds__pb2.UploadFileResponse.SerializeToString,
+                    request_deserializer=protos_dot_cmds_dot_cmds__pb2.UploadFileRequest.FromString,
+                    response_serializer=protos_dot_cmds_dot_cmds__pb2.UploadFileResponse.SerializeToString,
             ),
             'Screenshot': grpc.unary_unary_rpc_method_handler(
                     servicer.Screenshot,
-                    request_deserializer=cmds__pb2.ScreenshotRequest.FromString,
-                    response_serializer=cmds__pb2.ScreenshotResponse.SerializeToString,
+                    request_deserializer=protos_dot_cmds_dot_cmds__pb2.ScreenshotRequest.FromString,
+                    response_serializer=protos_dot_cmds_dot_cmds__pb2.ScreenshotResponse.SerializeToString,
             ),
             'GetAgents': grpc.unary_stream_rpc_method_handler(
                     servicer.GetAgents,
-                    request_deserializer=cmds__pb2.GetAgentsRequest.FromString,
-                    response_serializer=cmds__pb2.AgentInfo.SerializeToString,
+                    request_deserializer=protos_dot_cmds_dot_cmds__pb2.GetAgentsRequest.FromString,
+                    response_serializer=protos_dot_cmds_dot_cmds__pb2.AgentInfo.SerializeToString,
             ),
             'StartSocksServer': grpc.unary_unary_rpc_method_handler(
                     servicer.StartSocksServer,
-                    request_deserializer=cmds__pb2.StartSocksServerRequest.FromString,
-                    response_serializer=cmds__pb2.StartSocksServerResponse.SerializeToString,
+                    request_deserializer=protos_dot_cmds_dot_cmds__pb2.StartSocksServerRequest.FromString,
+                    response_serializer=protos_dot_cmds_dot_cmds__pb2.StartSocksServerResponse.SerializeToString,
             ),
             'StopSocksServer': grpc.unary_unary_rpc_method_handler(
                     servicer.StopSocksServer,
-                    request_deserializer=cmds__pb2.StopSocksServerRequest.FromString,
-                    response_serializer=cmds__pb2.StopSocksServerResponse.SerializeToString,
+                    request_deserializer=protos_dot_cmds_dot_cmds__pb2.StopSocksServerRequest.FromString,
+                    response_serializer=protos_dot_cmds_dot_cmds__pb2.StopSocksServerResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -172,8 +172,8 @@ class AgentManager(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/AgentManager/RunEchoCommand',
-            cmds__pb2.EchoCommandRequest.SerializeToString,
-            cmds__pb2.EchoCommandResponse.FromString,
+            protos_dot_cmds_dot_cmds__pb2.EchoCommandRequest.SerializeToString,
+            protos_dot_cmds_dot_cmds__pb2.EchoCommandResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -189,8 +189,8 @@ class AgentManager(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/AgentManager/RunShellCommand',
-            cmds__pb2.ShellCommandRequest.SerializeToString,
-            cmds__pb2.ShellCommandResponse.FromString,
+            protos_dot_cmds_dot_cmds__pb2.ShellCommandRequest.SerializeToString,
+            protos_dot_cmds_dot_cmds__pb2.ShellCommandResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -206,8 +206,8 @@ class AgentManager(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/AgentManager/DownloadFile',
-            cmds__pb2.DownloadFileRequest.SerializeToString,
-            cmds__pb2.DownloadFileResponse.FromString,
+            protos_dot_cmds_dot_cmds__pb2.DownloadFileRequest.SerializeToString,
+            protos_dot_cmds_dot_cmds__pb2.DownloadFileResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -223,8 +223,8 @@ class AgentManager(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/AgentManager/UploadFile',
-            cmds__pb2.UploadFileRequest.SerializeToString,
-            cmds__pb2.UploadFileResponse.FromString,
+            protos_dot_cmds_dot_cmds__pb2.UploadFileRequest.SerializeToString,
+            protos_dot_cmds_dot_cmds__pb2.UploadFileResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -240,8 +240,8 @@ class AgentManager(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/AgentManager/Screenshot',
-            cmds__pb2.ScreenshotRequest.SerializeToString,
-            cmds__pb2.ScreenshotResponse.FromString,
+            protos_dot_cmds_dot_cmds__pb2.ScreenshotRequest.SerializeToString,
+            protos_dot_cmds_dot_cmds__pb2.ScreenshotResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -257,8 +257,8 @@ class AgentManager(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_stream(request, target, '/AgentManager/GetAgents',
-            cmds__pb2.GetAgentsRequest.SerializeToString,
-            cmds__pb2.AgentInfo.FromString,
+            protos_dot_cmds_dot_cmds__pb2.GetAgentsRequest.SerializeToString,
+            protos_dot_cmds_dot_cmds__pb2.AgentInfo.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -274,8 +274,8 @@ class AgentManager(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/AgentManager/StartSocksServer',
-            cmds__pb2.StartSocksServerRequest.SerializeToString,
-            cmds__pb2.StartSocksServerResponse.FromString,
+            protos_dot_cmds_dot_cmds__pb2.StartSocksServerRequest.SerializeToString,
+            protos_dot_cmds_dot_cmds__pb2.StartSocksServerResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -291,7 +291,7 @@ class AgentManager(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/AgentManager/StopSocksServer',
-            cmds__pb2.StopSocksServerRequest.SerializeToString,
-            cmds__pb2.StopSocksServerResponse.FromString,
+            protos_dot_cmds_dot_cmds__pb2.StopSocksServerRequest.SerializeToString,
+            protos_dot_cmds_dot_cmds__pb2.StopSocksServerResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

