@@ -61,7 +61,7 @@ class Agent:
 
     def stop_socks_server(self) -> str:
         req = cmds_pb2.StopSocksServerRequest(agent_id=self.id)
-        resp = self._stub.StopSocksServer(req)
+        self._stub.StopSocksServer(req)
 
     def __repr__(self) -> str:
         return f"Agent(id={self.id})"
@@ -85,8 +85,10 @@ class ControllerClient:
     def get_agent(self, agent_id: int) -> Agent:
         return Agent(agent_id, self._stub)
 
-    def get_agents(self, alive_only=False) -> [cmds_pb2.AgentInfo]:
-        return self._stub.GetAgents(cmds_pb2.GetAgentsRequest(alive_only=alive_only))
+    def get_agents(self, alive_only=True) -> [cmds_pb2.AgentInfo]:
+        return list(
+            self._stub.GetAgents(cmds_pb2.GetAgentsRequest(alive_only=alive_only))
+        )
 
 
 if __name__ == "__main__":
