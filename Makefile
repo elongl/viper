@@ -8,15 +8,15 @@ BIN_PATH = $(MAKEFILE_DIR_PATH)bin
 build: build_agent build_agent_debug build_controller build_controller_client
 
 build_agent:
-	GOOS=windows go build -ldflags "-H=windowsgui -s -w" -o bin/agent.exe agent/main.go
-	go build -ldflags "-s -w" -o bin/agent agent/main.go
+	GOOS=windows go build -ldflags "-H=windowsgui -s -w" -o $(BIN_PATH)/agent.exe $(AGENT_PATH)/main.go
+	go build -ldflags "-s -w" -o $(BIN_PATH)/agent $(AGENT_PATH)/main.go
 
 build_agent_debug:
-	GOOS=windows go build -o $(BIN_PATH)/agent_debug.exe main.go
-	go build -o $(BIN_PATH)/agent_debug main.go
+	GOOS=windows go build -o $(BIN_PATH)/agent_debug.exe $(AGENT_PATH)/main.go
+	go build -o $(BIN_PATH)/agent_debug $(AGENT_PATH)/main.go
 
 build_controller:
-	go build -o bin/controller controller/main.go
+	go build -o $(BIN_PATH)/controller $(CONTROLLER_PATH)/main.go
 
 build_controller_client:
 	pip install -r $(CONTROLLER_CLIENT_PATH)/requirements.txt
@@ -32,4 +32,4 @@ install_proto:
 	pip install grpcio-tools
 
 clean:
-	rm -rf bin
+	rm -rf $(BIN_PATH)
