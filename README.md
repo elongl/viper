@@ -19,12 +19,15 @@ Remote control software using gRPC and Go.
 - **Screenshots**: Capture screenshots.
 - **Network Proxy**: Connect into the agent's network using [SOCKS](https://en.wikipedia.org/wiki/SOCKS).
 
-## Usage
+## Build
 
 1. Update the `config.json` according to your needs.
-2. Run the controller servers: `go run controller/main.go`.
-3. Build and run the agent: `make build_agent` or `go run agent/main.go`.
-4. Control the agents: `ipython -i controller-client/main.py`.
+2. Run `make` to build the executables in `bin`.
+
+## Usage
+
+1. Run `controller` to accept agent connections.
+2. Run the controller client to manage the agents: `ipython -i controller-client/main.py`.
 
 ```py
 cnc.get_agents()
